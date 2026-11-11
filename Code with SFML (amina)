@@ -156,6 +156,12 @@ int main()
 	rectangle.setOutlineThickness(1);
 	rectangle.setOutlineColor(sf::Color::Black);
 
+	sf::Texture mistTexture;
+	mistTexture.loadFromFile("mist.png");
+
+	sf::Sprite mistSpirite;
+	mistSpirite.setTexture(mistTexture);
+
 
 	while (window.isOpen())
 	{
@@ -181,6 +187,21 @@ int main()
 		grid_tile = get_tile(map, rowofplayer, colofplayer);
 		interaction_with_tile(grid_tile);
 
+		already_visited(map, rowofplayer, colofplayer);
+		game_map(map);
+
+		if (visited[rowofplayer][colofplayer] == false)
+		{
+			mistSpirite.setPosition(colofplayer * 90, rowofplayer * 90);
+			window.draw(mistSpirite);
+		}
+
 	}
-return 0;
+
+
+
+	 
+
+
+
 }
