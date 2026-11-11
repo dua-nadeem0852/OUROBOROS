@@ -1,0 +1,186 @@
+#include <iostream>
+#include <cctype>
+#include <SFML/Graphics.hpp>
+using namespace std;
+
+void game_map(char map[][10])
+{
+	//E = enemy  //T = traps  //C = chest //K=key  //R = relics  // . = empty tile
+	char game_map[10][10] = {
+		{ '.', 'T' , '.', '.' , 'E' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , 'T' , '.' , 'E' , 'K'},
+		{ 'T', '.' , 'E', '.' , 'R' , 'E' , '.' , 'R' , '.' , '.'},
+		{ '.', 'R' , '.', '.' , '.' , '.' , 'R' , '.' , '.' , '.'},
+		{ '.', '.' , '.', 'T' , '.' , '.' , '.' , '.' , '.' , 'T'},
+		{ '.', '.' , '.', '.' , '.' , 'E' , '.' , 'R' , '.' , '.'},
+		{ 'T', '.' , '.', '.' , 'T' , 'C' , 'T' , '.' , 'E' , '.'},
+		{ '.', 'E' , 'T', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', 'T' , 'R' , '.' , '.' , '.' , '.' , 'R'},
+		{ '.', '.' , '.', '.' , '.' , '.' , 'E' , '.' , '.' , '.'},
+	};
+}
+
+void player_movements(char map[][10], int direction, int& movecol, int& moverow) // 10 * 10 matrix
+{
+	if (direction == 'R') //right
+	{
+		if (movecol < 9)
+		{
+			movecol++;
+		}
+		else
+		{
+			cout << "You can't move towards right further";
+		}
+	}
+	else if (direction == 'L') //left
+	{
+		if (movecol > 0)
+		{
+			movecol--;
+		}
+		else
+		{
+			cout << "You can't move towards left further";
+		}
+	}
+	else if (direction == 'U') //up
+	{
+		if (movecol < 0)   //going from down to up till row 0 so it decreases
+		{
+			movecol--;
+		}
+		else
+		{
+			cout << "You can't move up further";
+		}
+	}
+	else if (direction == 'D') //down
+	{
+		if (movecol < 9)
+		{
+			movecol++;
+		}
+		else
+		{
+			cout << "You can't move down further";
+		}
+	}
+	else
+	{
+		cout << "Invalid direction";
+	}
+}
+
+void already_visited(char map[][10], int rowofplayer, int colofplayer)
+{
+	bool visitied[10][10]{
+		{ false, false, false, false, false, false, false, false, false, false },
+		{ false, false , false , false , false, false, false, false, false, false },
+		{ false, false, false, false, false, false, false, false, false, false },
+		{ false, false, false, false, false, false, false, false, false, false },
+		{ false, false, false, false, false, false, false, false, false, false },
+		{ false, false, false, false, false, false, false, false, false, false },
+		{ false, false , false , false , false, false, false, false, false, false },
+		{ false, false , false , false , false, false, false, false, false, false },
+		{ false, false, false, false, false, false, false, false, false, false },
+		{ false, false, false, false, false, false, false, false, false, false },
+	};
+
+	visitied[rowofplayer][colofplayer] = true;
+}
+
+char get_tile(char map[][10], int rowofplayer, int colofplayer)
+{
+	char grid_tile = map[rowofplayer][colofplayer];
+	return grid_tile;
+}
+
+void interaction_with_tile(char grid_tile)
+{
+	if (grid_tile == 'E')
+	{
+		cout << "Enemy";
+	}
+	else if (grid_tile == 'T')
+	{
+		cout << "Trap";
+	}
+	else if (grid_tile == 'K')
+	{
+		cout << "key";
+	}
+	else if (grid_tile == 'C')
+	{
+		cout << "treasure chest";
+	}
+	else if (grid_tile == 'R')
+	{
+		cout << "Relics";
+	}
+	else
+	{
+		cout << "nothing, just an empty tile";
+	}
+}
+
+int main()
+{
+	int rowofplayer = 9;
+	int colofplayer = 0;
+	char direction;
+	char grid_tile;
+
+	char map[10][10] = {
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
+	};
+	already_visited(map, rowofplayer, colofplayer);
+	game_map(map);
+
+	sf::RenderWindow
+	window(sf::VideoMode(900, 900), "OURBOROUS");
+	sf::RectangleShape
+	rectangle(sf::Vector2f(90, 90));
+	rectangle.setFillColor(sf::Color(216, 232, 208));
+	rectangle.setPosition(0, 0);
+
+	rectangle.setOutlineThickness(1);
+	rectangle.setOutlineColor(sf::Color::Black);
+
+
+	while (window.isOpen())
+	{
+
+		window.clear(sf::Color::White);
+		for (int i = 0; i < 10;i++)
+		{
+			for (int j = 0;j < 10;j++)
+			{
+				rectangle.setPosition(j * 90, i * 90);
+				window.draw(rectangle);
+			}
+		}
+		window.display();
+
+		cout << "Enter the direction to move your player (R = right, L = left , U = up, D = down)" << endl;
+		cin >> direction;
+		direction = toupper(direction);
+		cout << "Enter the value to move: ";
+		cin >> rowofplayer >> colofplayer;
+
+		player_movements(map, direction, rowofplayer, colofplayer);
+		grid_tile = get_tile(map, rowofplayer, colofplayer);
+		interaction_with_tile(grid_tile);
+
+	}
+return 0;
+}
