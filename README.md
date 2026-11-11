@@ -1,6 +1,5 @@
 # OUROBOROS
-Project Title: OUROBOROS
-Project Description:
+
 OUROBOROS is a 2D GUI-based exploration and adventure game developed in C++ using the SFML
 library. The player explores a mysterious, abandoned world through a tile-based map while searching for
 a hidden treasure chest.
