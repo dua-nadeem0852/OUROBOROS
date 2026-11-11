@@ -1,2 +1,129 @@
 # OUROBOROS
-Our shared code for the game "OUROBOROS" for pf project.
+Project Title: OUROBOROS
+Project Description:
+OUROBOROS is a 2D GUI-based exploration and adventure game developed in C++ using the SFML
+library. The player explores a mysterious, abandoned world through a tile-based map while searching for
+a hidden treasure chest.
+The game combines exploration, item collection, enemies, and turn-based combat. Most areas of the
+map are initially hidden, and the player gradually reveals them by moving through the environment.
+The player initially believes that the objective is simply to find the treasure. However, as the game
+progresses, they discover that there is more to this dark world than meets the eye.
+Purpose:
+The game will incorporate programming concepts covered during the course, including variables,
+conditional statements, loops, functions, arrays, 2D arrays etc where applicable and also provide a fun
+gaming experience.
+
+Objectives:
+The main objectives of the game are:
+● Explore the game world and reveal hidden areas.
+● Find clues, items, and useful relics.
+● Encounter and defeat enemies.
+● Gain experience from battles.
+● Improve the player's abilities through level ups.
+● Find the key required to progress.
+● Defeat the final Hydra boss.
+● Open the final treasure chest.
+● Discover the story and history of the mysterious world through the relics.
+Features:
+1. 2D GUI Map
+The game will use an SFML-based graphical interface with a tile-based map. Each tile can contain
+different objects, locations, enemies, traps, or items.
+
+2. Hidden and Revealed Tiles
+Most of the map will initially be hidden. As the player moves around the map, tiles will become visible.
+3. Player Movement
+The player will control the main character using keyboard controls and move through the grid.
+4. Exploration
+The player can explore different areas of the map to find enemies, clues, items, traps, and important
+locations. Even meet npcs.
+5. Inventory System
+The player will be able to collect and store items such as:
+● Keys
+● Relics
+● Health items
+● Special items
+● Story-related objects
+6. Health and Attack System
+The player will have health and attack statistics. Certain encounters and rewards can modify these
+statistics.
+7. Experience System
+Defeating enemies will make the player gain experience (exp) which will increase the player's level,
+making their attacks stronger and increase health.
+8. Turn-Based Combat
+When the player encounters an enemy, the game will enter a battle state. The player will be able to
+select actions such as:
+● Attack
+● Defend
+● Use Item
+● Run, where applicable
+The enemy will respond after the player's turn.
+9. Boss Battles
+
+The game will contain several important enemies with different purposes, the player can defeat them
+using the turn based combat system in the game.
+10. Relics and Story System
+The player will discover relics throughout the game. Relics will contain descriptions and information that
+gradually reveal the history of the world and the player's connection to it.
+11. The Treasure Chest
+After defeating the final boss, the player obtains the real key and can finally open the treasure chest. The
+contents of the chest provide the final story reveal.
+12. Game States
+The game will have multiple states, including:
+● Main Menu (including difficulty level, start game, exit etc)
+● Exploration
+● Battle
+● Inventory
+● Dialogue/Story
+● Game Over
+● Victory/Ending and then credit scene
+13. Difficulty levels
+The player first has to beat the game on the default difficulty level (normal) to unlock harder difficulty
+levels. The higher the difficulty level, the more the obstacles the player encounters.
+14. Controls
+Basic AWSD moving mechanics, E to interact, Enter for progressing the dialogue boxes, I for inventory,
+Esc for pausing etc. During battles, the player will use the designated keyboard keys to select combat
+actions.
+
+Game Rules:
+1. The player must remain within the boundaries of the game map.
+2. Hidden tiles are revealed when the player explores them.
+3. Items are collected by interacting with their corresponding tiles.
+4. Enemy encounters initiate the battle state.
+5. The player loses health when receiving damage.
+6. If the player's health reaches zero, the game enters the Game Over state.
+7. Optional enemies can be defeated to gain experience and upgrades.
+8. Find the key to the chest by exploration and defeating enemies.
+
+9. Opening the chest triggers the final story sequence.
+
+Technologies Used:
+Programming Language: C++
+Graphics/Game Library: SFML
+IDE: Visual Studio Code/Visual Studio/VS code
+Compiler: MinGW g++
+Graphics: 2D sprites and tile-based graphical assets.
+Others: Music and sound effects from external sources
+Data Storage: Text files for appropriate saved information such as high scores or game data
+
+Installation and Setup:
+● Install a C++ compiler such as MinGW.
+● Install Visual Studio Code or another suitable C++ development environment.
+● Install and configure the SFML library.
+● Download or open the project folder.
+● Ensure that the required SFML libraries and asset folders are located in the correct directories.
+● Compile the C++ source files using the configured compiler.
+● Run the resulting executable file.
+● The game will open in an SFML graphical window.
+
+Usage:
+When the game starts, the player will be presented with the main menu.
+After selecting Start Game, the player will enter the exploration map.
+The player uses the keyboard to move around the map. Hidden tiles are revealed as the player explores.
+Depending on the tile, the player may find an item, trigger a trap, discover a clue, or encounter an
+enemy.
+When an enemy is encountered, the game changes from the Exploration State to the Battle State. The
+player selects an action and the enemy responds.
+The player can return to exploration after winning a battle.
+The player can also access their inventory to view collected items and relics.
+Eventually, the player progresses toward the final encounter with the last boss and has to defeat it.
+The game then enters the Ending State, where the collected relics reveal the final story.
