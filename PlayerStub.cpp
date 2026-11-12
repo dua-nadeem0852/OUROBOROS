@@ -2,7 +2,7 @@
 // note to self: delete this file from the project once zarnibs code is integrated.
 #include "PlayerInterface.h"
 
-static int hp = 100; maxHp = 100, level = 1, diff = DIFF_NORMAL, exp_ = 0;
+static int hp = 100, maxHp = 100, level = 1, diff = DIFF_NORMAL, exp_ = 0;
 
 static int capacity = INVENTORY_SLOTS;      //inventory slots to be used
 static int slotId[INVENTORY_SLOTS] = { ITEM_HEALING_POTION, ITEM_BUFF_POTION, -1, -1, -1, -1, -1, -1 };
