@@ -47,8 +47,8 @@ static int curseTurns = 0;
 static int curseDamage= 0;
 static int hydraRound = 0;      //rounds completed against the hydra
 static int pendingItem = -1;    //waiting for inventory space
-static int battleCounter = 0;
-static int roundCounter = 0;
+static int battleCounterVal = 0;
+static int roundCounterVal = 0;
 static int lastDamageToEnemy = 0;
 static int lastDamageToPlayer = 0;
 static int lastHitHead = -1;
@@ -147,7 +147,7 @@ bool beginBattle(int bossType, int row, int col)
     if (isEnemyDefeated(row, col)) return false;
 
     createEnemy(bossType);
-    battleCounter++;
+    battleCounterVal++;
     lastDamageToEnemy = lastDamageToPlayer = 0;
     lastHitHead = -1;
     battleActive= true;
@@ -215,7 +215,7 @@ void advanceIntro()
 //player actions
 
 void setTargetHead(int head) { targetHead = head; }
-int  getTargetHead()         { return pickLivingHead(targetHead); }
+int  getTargetHead()  { return pickLivingHead(targetHead); }
 
 void cycleTargetHead(int direction)
 {
@@ -571,7 +571,7 @@ int playerAction(int action, int itemId)
     }
 
     if (!turnUsed) return battleResult;
-    roundCounter++;
+    roundCounterVal++;
 
     if (checkBattleResult() == BATTLE_ONGOING)
     {
@@ -615,19 +615,19 @@ bool retryPendingReward() //self explanatory
 }
 
 //read only info for screen
-int  battleCounter() { return battleCounter; }
-int  roundCounter() { return roundCounter; }
-int  lastDamageDealt() { return lastDamageToEnemy; }
-int  lastDamageTaken() { return lastDamageToPlayer; }
-int  lastHeadHit() { return lastHitHead; }
+int battleCounter() { return battleCounterVal; }
+int roundCounter() { return roundCounterVal; }
+int lastDamageDealt() { return lastDamageToEnemy; }
+int lastDamageTaken() { return lastDamageToPlayer; }
+int lastHeadHit() { return lastHitHead; }
 bool isBattleActive() { return battleActive; }
-int  getBattleResult() { return battleResult; }
+int getBattleResult() { return battleResult; }
 bool isPlayerDefending() { return playerDefending; }
-int  playerBuffTurns() { return buffTurns; }
-int  playerCurseTurns() { return curseTurns; }
-int  playerCurseDamage() { return curseDamage; }
-int  hydraTurnsUntilWail() { return WAIL_EVERY - (hydraRound % WAIL_EVERY); }
-int  battleLogCount() { return logCount; }
+int playerBuffTurns() { return buffTurns; }
+int playerCurseTurns() { return curseTurns; }
+int playerCurseDamage() { return curseDamage; }
+int hydraTurnsUntilWail() { return WAIL_EVERY - (hydraRound % WAIL_EVERY); }
+int battleLogCount() { return logCount; }
 bool isHydraDefeated() { return isBossTypeDefeated(ENEMY_HYDRA); }
 
 std::string getBattleLogLine(int index)
