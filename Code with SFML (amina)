@@ -72,22 +72,9 @@ void player_movements(char map[][10], int direction, int& movecol, int& moverow)
 	}
 }
 
-void already_visited(char map[][10], int rowofplayer, int colofplayer)
+void already_visited(char map[][10], bool visited[][10], int rowofplayer, int colofplayer)
 {
-	bool visitied[10][10]{
-		{ false, false, false, false, false, false, false, false, false, false },
-		{ false, false , false , false , false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false },
-		{ false, false , false , false , false, false, false, false, false, false },
-		{ false, false , false , false , false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false },
-		{ false, false, false, false, false, false, false, false, false, false },
-	};
-
-	visitied[rowofplayer][colofplayer] = true;
+	visited[rowofplayer][colofplayer] = true;
 }
 
 char get_tile(char map[][10], int rowofplayer, int colofplayer)
@@ -131,19 +118,11 @@ int main()
 	char direction;
 	char grid_tile;
 
-	char map[10][10] = {
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-		{ '.', '.' , '.', '.' , '.' , '.' , '.' , '.' , '.' , '.'},
-	};
-	already_visited(map, rowofplayer, colofplayer);
+	bool visited[10][10] = { false };
+
+	char map[10][10] = { "." };
+
+	already_visited(map, visited, rowofplayer, colofplayer);
 	game_map(map);
 
 	sf::RenderWindow
@@ -187,7 +166,7 @@ int main()
 		grid_tile = get_tile(map, rowofplayer, colofplayer);
 		interaction_with_tile(grid_tile);
 
-		already_visited(map, rowofplayer, colofplayer);
+		already_visited(map,visited, rowofplayer, colofplayer);
 		game_map(map);
 
 		if (visited[rowofplayer][colofplayer] == false)
@@ -197,11 +176,4 @@ int main()
 		}
 
 	}
-
-
-
-	 
-
-
-
 }
