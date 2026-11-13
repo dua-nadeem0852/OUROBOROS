@@ -1,5 +1,73 @@
 # OUROBOROS
 
+# IMPLEMENTATION
+sfml version used: 2.6.2
+
+**(26L-0852) member 3 :**
+I made the whole New_Combat folder. (accidentally forgot to submit the whole folder and so there exists some of its files outside the folder, i didn't delete them just in case the TA would ask for why those files are deleted).
+
+So far, all the combat mechanics have been implemented. All that's really left is to make the game look prettier by adding backgrounds etc and sounds. I have implemented a few just to test things out, so they're more of placeholders while some will stay in the game when finalized.
+
+basic combat for the player:
+attack, defend, use item, run(decoy)
+
+items:
+potions for healing, buffs and poisoning
+
+boss specific mechanics:
+the mad scientist basically consumes his own hp to buff his attacks, rng handles that
+the humanoid bat can summon other bats for extra damage
+the human hydra has a wail mechanic that essentially does more attack, it is triggered every two turns of the hydra. all the heads of hydra cannot perform the same action (heal, attack, defend) in one turn but two can.
+
+exp, rewards etc:
+attack levels and other things like reward handling and exp have been implemented as well.
+
+dialogue:
+the mad scientist's (boss 1) dialogue has been handled, the other two bosses can't really speak so no dialogue for them.
+
+sound and ui:
+i added code to change the pitch sometimes like when the player (viktor) is hurt
+and have to just add the other sound effects that will be played when they are called.
+implemented a boss theme as well (hydra)
+
+testing:
+i have a demo made to test the combat (exe so github wont let me upload it)
+
+
+File	                                          What it does
+Battle.cpp:	    Main battle system. Handles player turns, attacks, defending, items, boss turns, rewards and battle outcomes.
+
+Battle.h:      	Header for the battle system. Declares battle functions, actions, states and constants.
+
+BattleDemo.cpp:	Main program that launches the battle demo and creates the game window.
+
+BattleScreen.cpp:	Handles the visual battle screen, including backgrounds, characters, animations, health bars and menus.
+
+BattleScreen.h:	  Declares the functions and screen dimensions used by the battle screen.
+
+BattleSound.cpp:	 Handles background music and sound effects during battles.
+
+BattleSound.h:    Declares the sound and music functions.
+
+Enemy.cpp:      Handles enemy statistics, health, damage, special abilities and defeated-boss tracking.
+
+Enemy.h:	        Declares enemy types, enemy-related constants and functions.
+
+PlayerInterface.h:	   Defines the interface between the battle system and the player's stats and inventory.
+
+PlayerStub.cpp:    	Temporary implementation of player statistics and inventory for testing the battle system.
+
+UiDraw.cpp:	    Contains reusable drawing functions for text, panels, health bars, sprites and other visual elements.
+
+UiDraw.h:	      Declares the drawing helper functions used by UiDraw.cpp.
+
+TestBattle.cpp:	 Contains automated tests to check whether the battle system works correctly.
+
+the assets are pretty self explanatory
+_________________________________________________________________________________________________________________________________
+
+
+# PROJECT PROPOSAL
 OUROBOROS is a 2D GUI-based exploration and adventure game developed in C++ using the SFML
 library. The player explores a mysterious, abandoned world through a tile-based map while searching for
 a hidden treasure chest.

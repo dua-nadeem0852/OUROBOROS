@@ -58,7 +58,7 @@ bool addItem(int id)
     if (s >= 0) { slotCount[s]++; return true; }          //stack copies
     if (slotsUsed() >= capacity) return false;            //inventory is full
     for (int i = 0; i < INVENTORY_SLOTS; i++)
-        if (slotCount[i] == 0) { slotId[i] = id; slotCount[i] = 1; return true; }
+    if (slotCount[i] == 0) { slotId[i] = id; slotCount[i] = 1; return true; }
     return false;
 }
 

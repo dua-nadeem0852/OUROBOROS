@@ -1,0 +1,306 @@
+#include <iostream>
+#include <cctype>
+#include <SFML/Graphics.hpp>
+using namespace std;
+
+void game_map(char map[][10])
+{
+	//E = enemy  //T = traps  //H = hole //C = chest //K=key  //R = relics  // . = empty tile // B = Bush
+	char game_map[10][10] = {
+		{ '.', 'T' , '.', 'B' , 'E' , '.' , 'B' , '.' , '.' , '.'},
+		{ '.', '.' , '.', '.' , '.' , '.' , 'T' , '.' , 'E' , 'K'},
+		{ 'H', '.' , 'E', '.' , 'R' , 'E' , '.' , 'R' , '.' , '.'},
+		{ '.', 'R' , '.', '.' , '.' , '.' , 'R' , '.' , '.' , '.'},
+		{ '.', '.' , '.', 'T' , 'B' , '.' , '.' , '.' , 'T' , 'H'},
+		{ '.', 'B' , '.', '.' , '.' , 'E' , '.' , 'R' , '.' , '.'},
+		{ 'T', '.' , '.', '.' , 'H' , 'C' , 'H' , '.' , 'E' , '.'},
+		{ '.', 'E' , 'T', '.' , '.' , 'B' , '.' , '.' , '.' , '.'},
+		{ '.', '.' , '.', 'T' , 'R' , '.' , '.' , '.' , '.' , 'R'},
+		{ 'B', '.' , '.', '.' , '.' , '.' , 'E' , '.' , '.' , '.'},
+	};
+}
+
+void player_movements(char map[][10], int direction, int &movecol, int &moverow) // 10 * 10 matrix
+{
+	if (direction == 'R') //right
+	{
+		if (movecol < 9)
+		{
+			movecol++;
+		}
+		else
+		{
+			cout << "You can't move towards right further";
+		}
+	}
+	else if (direction == 'L') //left
+	{
+		if (movecol > 0)
+		{
+			movecol--;
+		}
+		else
+		{
+			cout << "You can't move towards left further";
+		}
+	}
+	else if (direction == 'U') //up
+	{
+		if (moverow > 0)   //going from down to up till row 0 so it decreases
+		{
+			moverow--;
+		}
+		else
+		{
+			cout << "You can't move up further";
+		}
+	}
+	else if (direction == 'D') //down
+	{
+		if (moverow < 9)
+		{
+			moverow++;
+		}
+		else
+		{
+			cout << "You can't move down further";
+		}
+	}
+	else
+	{
+		cout << "Invalid direction";
+	}
+}
+
+void already_visited(char map[][10], bool visited[][10], int rowofplayer, int colofplayer)
+{
+	visited[rowofplayer][colofplayer] = true;
+}
+
+char get_tile(char map[][10], int rowofplayer, int colofplayer)
+{
+	char grid_tile = map[rowofplayer][colofplayer];
+	return grid_tile;
+}
+
+void interaction_with_tile(char grid_tile)
+{
+	if (grid_tile == 'E')
+	{
+		cout << "Enemy" <<  endl;
+	}
+	else if (grid_tile == 'T')
+	{
+		cout << "Trap" << endl;
+	}
+	else if (grid_tile == 'K')
+	{
+		cout << "key" << endl;
+	}
+	else if (grid_tile == 'C')
+	{
+		cout << "treasure chest" << endl;
+	}
+	else if (grid_tile == 'R')
+	{
+		cout << "Relics" << endl;
+	}
+	else
+	{
+		cout << "nothing, just an empty tile" << endl;
+	}
+}
+
+int main()
+{
+	int rowofplayer = 4;
+	int colofplayer = 4;
+	char direction;
+	char grid_tile;
+
+	bool visited[10][10] = { false };
+	visited[4][4] = true;
+
+	char map[10][10] = { "." };
+
+	already_visited(map, visited, rowofplayer, colofplayer);
+	game_map(map);
+
+	sf::RenderWindow
+		window(sf::VideoMode(900, 900), "OURBOROUS");
+	sf::RectangleShape rectangle(sf::Vector2f(90, 90));
+	rectangle.setFillColor(sf::Color(216, 232, 208));
+
+	rectangle.setOutlineThickness(1);
+	rectangle.setOutlineColor(sf::Color::Black);
+
+	sf::Texture treasure;                         // TREASURE CHEST
+	treasure.loadFromFile("treasurechest.png");
+	sf::Sprite treasure_sprite;
+	treasure_sprite.setTexture(treasure);
+	treasure_sprite.setScale(
+		90.f /                          // f means floating point number, calculating scale factor 
+		treasure.getSize().x,
+		90.f /
+		treasure.getSize().y
+	);
+
+	sf::Texture key;                              // KEY
+	key.loadFromFile("key.png");
+	sf::Sprite key_sprite;
+	key_sprite.setTexture(key);
+	key_sprite.setScale(
+		90.f /
+		key.getSize().x,
+		90.f /
+		key.getSize().y
+	);
+
+	sf::Texture hole;                           // HOLE
+	hole.loadFromFile("hole.png");
+	sf::Sprite hole_sprite;
+	hole_sprite.setTexture(hole);
+	hole_sprite.setScale(
+		90.f /
+		hole.getSize().x,
+		90.f /
+		hole.getSize().y
+	);
+
+	sf::Texture trap;                          // TRAP
+	trap.loadFromFile("trap.png");
+	sf::Sprite trap_sprite;
+	trap_sprite.setTexture(trap);
+	trap_sprite.setScale(
+		90.f /
+		trap.getSize().x,
+		90.f /
+		trap.getSize().y
+	);
+
+	sf::Texture bush;                         // BUSH
+	bush.loadFromFile("bush.png");
+	sf::Sprite bush_sprite;
+	bush_sprite.setTexture(bush);
+	bush_sprite.setScale(
+		90.f /
+		bush.getSize().x,
+		90.f /
+		bush.getSize().y
+	);
+
+
+	sf::Texture mist;
+	mist.loadFromFile("mist.png");
+	sf::Sprite mist_sprite;
+	mist_sprite.setTexture(mist);
+	mist_sprite.setColor(sf::Color(255, 255, 255, 50)); // last value handling the mist transparency
+
+	mist_sprite.setScale( // * by the orginal image width & height by 90
+		90.f /
+		mist.getSize().x,  //width
+		90.f /
+		mist.getSize().y); //height
+
+
+	sf::Texture character;
+	character.loadFromFile("character.jpg");
+	sf::Sprite character_sprite;
+	character_sprite.setTexture(character);
+
+	character_sprite.setScale(
+		90.f /
+		character.getSize().x,
+		90.f /
+		character.getSize().y
+	);
+
+
+	while (window.isOpen())
+	{
+		window.clear(); //clears the previous frame
+		for (int i = 0; i < 10;i++)
+		{
+			for (int j = 0;j < 10;j++)
+			{
+				rectangle.setPosition(j * 90, i * 90);
+
+				if (i == rowofplayer && j == colofplayer)
+				{
+					rectangle.setFillColor(sf::Color(216, 232, 208));
+				}
+				else
+				{
+					rectangle.setFillColor(sf::Color::White);
+				}
+				window.draw(rectangle);
+			}
+		}
+
+		for (int i = 0; i < 10;i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				game_map(map);
+				if (map[i][j] == 'C')
+				{
+					treasure_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+					window.draw(treasure_sprite);
+				}
+
+				if (map[i][j] == 'K')
+				{
+					key_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+					window.draw(key_sprite);
+				}
+
+				if (map[i][j] == 'B')
+				{
+					bush_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+					window.draw(bush_sprite);
+				}
+
+				if (map[i][j] == 'T')
+				{
+					trap_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+					window.draw(trap_sprite);
+				}
+
+				if (map[i][j] == 'H')
+				{
+					hole_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+					window.draw(hole_sprite);
+				}
+			}
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				if (visited[i][j] == false)
+				{
+					mist_sprite.setPosition(j * 90, i * 90);
+					window.draw(mist_sprite);
+				}
+			}
+		}
+
+		character_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+		window.draw(character_sprite);
+
+		window.display();
+
+		cout << "Enter the direction to move your player (R = right, L = left , U = up, D = down)" << endl;
+		cin >> direction;
+		direction = toupper(direction);
+
+		player_movements(map, direction, rowofplayer, colofplayer);
+		grid_tile = get_tile(map, rowofplayer, colofplayer);
+		interaction_with_tile(grid_tile);
+		already_visited(map, visited, rowofplayer, colofplayer);
+		game_map(map);
+
+	}
+	return 0;
+}
