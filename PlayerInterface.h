@@ -1,13 +1,13 @@
-// PlayerInterface.h  
+
 // it contains a list of all the functions members 1 and 3 will be able to call from here.
-// It only DECLARES functions (name + inputs + output). It's really easy to summon units, while unit.cpp is the true LOTR.
+// It only DECLARES functions It's really easy to summon units,
 
 #ifndef PLAYER_INTERFACE_H     // "including  guard into it to  prevents double inclusion of this file.....
 #define PLAYER_INTERFACE_H
 
 #include <string>
 
-//  Item identifiers ----------
+//  Item identifiers 
 // instead of using the numbers we use their names and it will automatically give it a number
 
 const int ITEM_HEALING_POTION = 0;
@@ -80,13 +80,13 @@ int  getTotalItems();                      // total items carried (uses recursio
 const char* getItemDescription(int itemId);
 
 
-// Player name (C-string)
+// using c strings for player naem
 void setPlayerName(const char* newName);
 const char* getPlayerName();
 
 
 
-//progress flagss
+// flagss
 
 void setProgressFlag(unsigned int flag);
 void clearProgressFlag(unsigned int flag);
@@ -102,7 +102,7 @@ int findItemIdByName(const char* name);
 // starting the game from start ....
 void resetPlayerToDefault();
 
-// ---------- Saving / loading ----------
+//  Saving / loading 
 
 bool saveGameBackup(const std::string& filename ="save_backup.txt");
 bool loadGameBackup(const std::string& filename ="save_backup.txt");
