@@ -200,7 +200,7 @@ int main()
 		90.f /
 		mist.getSize().x,  //width
 		90.f /
-		mist.getSize().y); //heightg
+		mist.getSize().y); //height
 
 
 	sf::Texture character;
@@ -236,22 +236,6 @@ int main()
 				window.draw(rectangle);
 			}
 		}
-
-
-		for (int i = 0; i < 10; i++)
-		{
-			for (int j = 0; j < 10; j++)
-			{
-				if (visited[i][j] == false)
-				{
-					mist_sprite.setPosition(j * 90, i * 90);
-					window.draw(mist_sprite);
-				}
-			}
-		}
-
-		character_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
-		window.draw(character_sprite);
 
 		for (int i = 0; i < 10;i++)
 		{
@@ -289,6 +273,22 @@ int main()
 				}
 			}
 		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				if (visited[i][j] == false)
+				{
+					mist_sprite.setPosition(j * 90, i * 90);
+					window.draw(mist_sprite);
+				}
+			}
+		}
+
+		character_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+		window.draw(character_sprite);
+
 		window.display();
 
 		cout << "Enter the direction to move your player (R = right, L = left , U = up, D = down)" << endl;
