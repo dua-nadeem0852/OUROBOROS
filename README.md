@@ -3,7 +3,7 @@
 # IMPLEMENTATION
 sfml version used: 2.6.2
 
-**(26L-0852) member 3 :**
+**Member 3 (26L-0852) :**
 I made the whole New_Combat folder. (accidentally forgot to submit the whole folder and so there exists some of its files outside the folder, i didn't delete them just in case the TA would ask for why those files are deleted).
 
 So far, all the combat mechanics have been implemented. All that's really left is to make the game look prettier by adding backgrounds etc and sounds. I have implemented a few just to test things out, so they're more of placeholders while some will stay in the game when finalized.
@@ -66,9 +66,10 @@ TestBattle.cpp:	 Contains automated tests to check whether the battle system wor
 the assets are pretty self explanatory
 _________________________________________________________________________________________________________________________________
 
-**(26L-0760) member 1 :**
+**Member 1 (26L-0760) :**
 
-I made the folder named "Images" which consists of the pictures I have used for my gaming map layout. Moreover, there is the initial code I wrote without using SFML (Map Setup (without SFML)) and later I even added the code where I have implemented SFML to it (Map setup & Player Movements) along with its cpp file (Map & Player Setup.cpp).
+I made the folder named "Images" which consists of the pictures I have used for my gaming map layout.
+Moreover, there is the initial code I wrote without using SFML (Map Setup (without SFML)) and later I even added the code where I have implemented SFML to it (Map setup & Player Movements) along with its cpp file (Map & Player Setup.cpp).
 
 ~ ~ ~ What I did ~ ~ ~
 • Made the map using a 2D array
@@ -82,8 +83,8 @@ I made the folder named "Images" which consists of the pictures I have used for 
 • Drew the player sprite at the correct grid position
 
 ~ ~ ~ What's left ~ ~ ~
-• Player control movements
-• Include the enemy into the grid
+• Player control movements: connect the movement keys so the player moves in four directions, using the existing boundary and blocked-tile checks
+• Include the enemy into the grid: place enemy tiles on the map and show them on screen
 • a sound affect when the player the tile or collects a relic
 
 _________________________________________________________________________________________________________________________________
