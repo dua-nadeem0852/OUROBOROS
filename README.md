@@ -1,5 +1,25 @@
 # OUROBOROS
 
+# IMPLEMENTATION
+sfml version used: 2.6.2
+
+(26L-0852) member 3 :
+I made the whole New_Combat folder. (accidentally forgot to submit the whole folder and so there exists some of its files outside the folder, i didn't delete them just in case the TA would ask for why those files are deleted).
+
+So far, all the combat mechanics have been implemented. All that's really left is to make the game look prettier by adding backgrounds etc and sounds. I have implemented a few just to test things out, so they're more of placeholders while some will stay in the game when finalized.
+
+boss specific mechanics:
+the mad scientist basically consumes his own hp to buff his attacks
+the humanoid bat can summon other bats for extra damage
+the human hydra has a wail mechanic that essentially does more attack, it is triggered every two turns of the hydra
+
+exp, rewards etc:
+atk levels and other things like reward handling and exp have been implemented as well
+
+_________________________________________________________________________________________________________________________________
+
+
+# PROJECT PROPOSAL
 OUROBOROS is a 2D GUI-based exploration and adventure game developed in C++ using the SFML
 library. The player explores a mysterious, abandoned world through a tile-based map while searching for
 a hidden treasure chest.
