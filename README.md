@@ -66,6 +66,27 @@ TestBattle.cpp:	 Contains automated tests to check whether the battle system wor
 the assets are pretty self explanatory
 _________________________________________________________________________________________________________________________________
 
+**(26L-0760) member 1 :**
+
+I made the folder named "Images" which consists of the pictures I have used for my gaming map layout. Moreover, there is the initial code I wrote without using SFML (Map Setup (without SFML)) and later I even added the code where I have implemented SFML to it (Map setup & Player Movements) along with its cpp file (Map & Player Setup.cpp).
+
+~ ~ ~ What I did ~ ~ ~
+• Made the map using a 2D array
+• Set tile types for empty ground, bush, traps, holes, treasure, and important locations
+• Stored the player's row and column
+• Added boundary checks and tiles which have been already visitied
+• Tracked visited and revealed tiles
+• Added tile interaction so the game can tell what's on the current tile
+• Wrote and tested the map setup/initialization functions
+• Displayed the grid and tile graphics in SFML
+• Drew the player sprite at the correct grid position
+
+~ ~ ~ What's left ~ ~ ~
+• Player control movements
+• Include the enemy into the grid
+• a sound affect when the player the tile or collects a relic
+
+_________________________________________________________________________________________________________________________________
 
 # PROJECT PROPOSAL
 OUROBOROS is a 2D GUI-based exploration and adventure game developed in C++ using the SFML
