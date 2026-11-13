@@ -53,7 +53,7 @@ int  playerAction(int action, int itemId = 0);
 void playerAtk();
 void defend();
 bool useBattleItem(int itemId);       //returns true if an item was used
-bool ateemptRun();                //will return false because its a fake run option
+bool attemptRun();                //will return false because its a fake run option
 
 int  checkBattleResult();
 void battleReward();          //hp, level exp and atk etc
