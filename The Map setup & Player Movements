@@ -20,7 +20,7 @@ void game_map(char map[][10])
 	};
 }
 
-void player_movements(char map[][10], int direction, int& movecol, int& moverow) // 10 * 10 matrix
+void player_movements(char map[][10], int direction, int &movecol, int &moverow) // 10 * 10 matrix
 {
 	if (direction == 'R') //right
 	{
@@ -48,7 +48,7 @@ void player_movements(char map[][10], int direction, int& movecol, int& moverow)
 	{
 		if (movecol < 0)   //going from down to up till row 0 so it decreases
 		{
-			movecol--;
+			moverow--;
 		}
 		else
 		{
@@ -57,9 +57,9 @@ void player_movements(char map[][10], int direction, int& movecol, int& moverow)
 	}
 	else if (direction == 'D') //down
 	{
-		if (movecol < 9)
+		if (moverow < 9)
 		{
-			movecol++;
+			moverow++;
 		}
 		else
 		{
@@ -113,12 +113,13 @@ void interaction_with_tile(char grid_tile)
 
 int main()
 {
-	int rowofplayer = 9;
-	int colofplayer = 0;
+	int rowofplayer = 4;
+	int colofplayer = 4;
 	char direction;
 	char grid_tile;
 
 	bool visited[10][10] = { false };
+	visited[4][4] = true;
 
 	char map[10][10] = { "." };
 
@@ -126,54 +127,142 @@ int main()
 	game_map(map);
 
 	sf::RenderWindow
-	window(sf::VideoMode(900, 900), "OURBOROUS");
+		window(sf::VideoMode(900, 900), "OURBOROUS");
 	sf::RectangleShape
-	rectangle(sf::Vector2f(90, 90));
+		rectangle(sf::Vector2f(90, 90));
 	rectangle.setFillColor(sf::Color(216, 232, 208));
-	rectangle.setPosition(0, 0);
+	rectangle.setPosition(0, 0);     //setPosition where it should appear
 
 	rectangle.setOutlineThickness(1);
 	rectangle.setOutlineColor(sf::Color::Black);
 
-	sf::Texture mistTexture;
-	mistTexture.loadFromFile("mist.png");
+	sf::Texture treasure;                         // TREASURE CHEST
+	treasure.loadFromFile("treasurechest.jpg");
+	sf::Sprite treasure_sprite;
+	treasure_sprite.setTexture(treasure);
+	treasure_sprite.setScale(
+		90.f /
+		treasure.getSize().x,
+		90.f /
+		treasure.getSize().y
+	);
 
-	sf::Sprite mistSpirite;
-	mistSpirite.setTexture(mistTexture);
+	sf::Texture key;                              // KEY
+	key.loadFromFile("key.jpg");
+	sf::Sprite key_sprite;
+	key_sprite.setTexture(key);
+	key_sprite.setScale(
+		90.f /
+		key.getSize().x,
+		90.f /
+		key.getSize().y
+	);
+
+	sf::Texture hole;                           // HOLE
+	hole.loadFromFile("hole.jpg");
+	sf::Sprite hole_sprite;
+	hole_sprite.setTexture(hole);
+	hole_sprite.setScale(
+		90.f /
+		hole.getSize().x,
+		90.f /
+		hole.getSize().y
+	);
+
+	sf::Texture trap;                          // TRAP
+	trap.loadFromFile("trap.jpg");
+	sf::Sprite trap_sprite;
+	trap_sprite.setTexture(trap);
+	trap_sprite.setScale(
+		90.f /
+		trap.getSize().x,
+		90.f /
+		trap.getSize().y
+	);
+
+	sf::Texture bush;                         // BUSH
+	bush.loadFromFile("bush.jpg");
+	sf::Sprite bush_sprite;
+	bush_sprite.setTexture(bush);
+	bush_sprite.setScale(
+		90.f /
+		bush.getSize().x,
+		90.f /
+		bush.getSize().y
+	);
+
+
+	sf::Texture mist;
+	mist.loadFromFile("mist.png");
+	sf::Sprite mist_sprite;
+	mist_sprite.setTexture(mist);
+	mist_sprite.setColor(sf::Color(255, 255, 255, 25)); // last value handling the mist transparency
+
+	mist_sprite.setScale( // * by the orginal image width & height by 90
+		90.f /
+		mist.getSize().x,  //width
+		90.f /
+		mist.getSize().y); //height
+
+
+	sf::Texture character;
+	character.loadFromFile("character.jpg");
+	sf::Sprite character_sprite;
+	character_sprite.setTexture(character);
+
+	character_sprite.setScale(
+		90.f /
+		character.getSize().x,
+		90.f /
+		character.getSize().y
+	);
 
 
 	while (window.isOpen())
 	{
-
-		window.clear(sf::Color::White);
+		window.clear(); //clears the previous frame
 		for (int i = 0; i < 10;i++)
 		{
 			for (int j = 0;j < 10;j++)
 			{
 				rectangle.setPosition(j * 90, i * 90);
+
+				if (i == rowofplayer && j == colofplayer)
+				{
+					rectangle.setFillColor(sf::Color(216, 232, 208));
+				}
+				else
+				{
+					rectangle.setFillColor(sf::Color::White);
+				}
 				window.draw(rectangle);
 			}
 		}
+		for (int i = 0; i < 10; i++)
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				if (visited[i][j] == false)
+				{
+					mist_sprite.setPosition(j * 90, i * 90);
+					window.draw(mist_sprite);
+				}
+			}
+		}
+		character_sprite.setPosition(colofplayer * 90, rowofplayer * 90);
+		window.draw(character_sprite);
 		window.display();
 
 		cout << "Enter the direction to move your player (R = right, L = left , U = up, D = down)" << endl;
 		cin >> direction;
 		direction = toupper(direction);
-		cout << "Enter the value to move: ";
-		cin >> rowofplayer >> colofplayer;
-
+	
 		player_movements(map, direction, rowofplayer, colofplayer);
 		grid_tile = get_tile(map, rowofplayer, colofplayer);
 		interaction_with_tile(grid_tile);
-
 		already_visited(map,visited, rowofplayer, colofplayer);
 		game_map(map);
 
-		if (visited[rowofplayer][colofplayer] == false)
-		{
-			mistSpirite.setPosition(colofplayer * 90, rowofplayer * 90);
-			window.draw(mistSpirite);
-		}
 
 	}
 }
