@@ -35,33 +35,33 @@ i have a demo made to test the combat (exe so github wont let me upload it)
 
 
 File	                                          What it does
-Battle.cpp	    Main battle system. Handles player turns, attacks, defending, items, boss turns, rewards and battle outcomes.
+Battle.cpp:	    Main battle system. Handles player turns, attacks, defending, items, boss turns, rewards and battle outcomes.
 
-Battle.h      	Header for the battle system. Declares battle functions, actions, states and constants.
+Battle.h:      	Header for the battle system. Declares battle functions, actions, states and constants.
 
-BattleDemo.cpp	Main program that launches the battle demo and creates the game window.
+BattleDemo.cpp:	Main program that launches the battle demo and creates the game window.
 
-BattleScreen.cpp	Handles the visual battle screen, including backgrounds, characters, animations, health bars and menus.
+BattleScreen.cpp:	Handles the visual battle screen, including backgrounds, characters, animations, health bars and menus.
 
-BattleScreen.h	  Declares the functions and screen dimensions used by the battle screen.
+BattleScreen.h:	  Declares the functions and screen dimensions used by the battle screen.
 
-BattleSound.cpp	 Handles background music and sound effects during battles.
+BattleSound.cpp:	 Handles background music and sound effects during battles.
 
-BattleSound.h    Declares the sound and music functions.
+BattleSound.h:    Declares the sound and music functions.
 
-Enemy.cpp       Handles enemy statistics, health, damage, special abilities and defeated-boss tracking.
+Enemy.cpp:      Handles enemy statistics, health, damage, special abilities and defeated-boss tracking.
 
-Enemy.h	        Declares enemy types, enemy-related constants and functions.
+Enemy.h:	        Declares enemy types, enemy-related constants and functions.
 
-PlayerInterface.h	   Defines the interface between the battle system and the player's stats and inventory.
+PlayerInterface.h:	   Defines the interface between the battle system and the player's stats and inventory.
 
-PlayerStub.cpp    	Temporary implementation of player statistics and inventory for testing the battle system.
+PlayerStub.cpp:    	Temporary implementation of player statistics and inventory for testing the battle system.
 
-UiDraw.cpp	    Contains reusable drawing functions for text, panels, health bars, sprites and other visual elements.
+UiDraw.cpp:	    Contains reusable drawing functions for text, panels, health bars, sprites and other visual elements.
 
-UiDraw.h	      Declares the drawing helper functions used by UiDraw.cpp.
+UiDraw.h:	      Declares the drawing helper functions used by UiDraw.cpp.
 
-TestBattle.cpp	 Contains automated tests to check whether the battle system works correctly.
+TestBattle.cpp:	 Contains automated tests to check whether the battle system works correctly.
 
 the assets are pretty self explanatory
 _________________________________________________________________________________________________________________________________
