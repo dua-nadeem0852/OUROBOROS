@@ -1,54 +1,77 @@
+// PlayerInterface.h  
 // it contains a list of all the functions members 1 and 3 will be able to call from here.
-// It only DECLARES functions It's really easy to summon units,
+// It only DECLARES functions (name + inputs + output). It's really easy to summon units, while unit.cpp is the true LOTR.
 
 #ifndef PLAYER_INTERFACE_H     // "including  guard into it to  prevents double inclusion of this file.....
-
-
 #define PLAYER_INTERFACE_H
+
 #include <string>
 
-
-//  Item identifiers 
+//  Item identifiers ----------
 // instead of using the numbers we use their names and it will automatically give it a number
+
 const int ITEM_HEALING_POTION = 0;
-const int ITEM_POISON_POTION = 1;
-const int ITEM_BUFF_POTION = 2;
-const int ITEM_RELIC = 3;
-const int ITEM_REAL_KEY = 4;   //both keys are shown to the player as key, they dont know which ones fake which ones real
-const int ITEM_DECOY_KEY = 5;  
-const int ITEM_TYPE_COUNT = 6;
+const int ITEM_POISON_POTION  = 1;
+const int ITEM_BUFF_POTION    = 2;
+const int ITEM_RELIC          = 3;
+const int ITEM_REAL_KEY       = 4;
+const int ITEM_DECOY_KEY      = 5;
+const int ITEM_TYPE_COUNT     = 6;
 
-//difficulty level vals
-const int DIFF_EASY = 0;
+// for difficult levels ......
+const int DIFF_EASY   = 0;
 const int DIFF_NORMAL = 1;
-const int DIFF_HARD = 2;
+const int DIFF_HARD   = 2;
 
-//read player stats
+//Inventory size ...
+const int INVENTORY_SLOTS = 8;
+
+//  using flag check  to avoid using alot of memory and making checking much faster
+// These are ONESwitches (ONE bit in one number) each flag.
+// "1u << 3" means: start with 1, slide it 3 places left  ->  binary 1000
+const unsigned int PROGRESS_HAS_REAL_KEY   = 1u << 0;
+const unsigned int PROGRESS_HAS_RELIC   = 1u << 1;
+const unsigned int PROGRESS_BAT_DEFEATED  = 1u << 2;
+const unsigned int PROGRESS_HYDRA_DEFEATED   = 1u << 3;
+const unsigned int PROGRESS_MAD_SCIENTIST   = 1u << 4;
+// (the inventory's relic strip reads these)
+const unsigned int PROGRESS_RELIC_1 = 1u << 5;   // The Beginning
+const unsigned int PROGRESS_RELIC_2 = 1u << 6;   // The Experiment
+const unsigned int PROGRESS_RELIC_3 = 1u << 7;   // The Lost World
+
+// Reading  stats of player....
+
 int getPlayerHP();
 int getPlayerMaxHP();
-int getplayerAtk();          //dmg a normal atk of the player deals depending on their atk level
-int getplayerAtkLevel();     
-int getPlayerMaxAttackLevel();  //to be decided
+int getplayerAtk();              
+int getplayerAtkLevel();
+int getPlayerMaxAttackLevel();
 int getDifficulty();
 
-//update player stats                            (zarnib should keep HP within 0 to max hp inside these)
+// now updating the stats of player....
+
 void takeDamage(int amount);
-void healPlayer(int amount);
+void healPlayer(int amount);     //will add the amount into hp when you drink any potion...
+void healPlayer();                //  When hp needs to be fullly restored....
 void addExperience(int amount);
-void increasePlayerMaxHP(int amount);   //combat calls this with (boss exp / 2)
-void increaseAttackLevel();             //combat calls this after scientist and bat
+void increasePlayerMaxHP(int amount);
+void increaseAttackLevel();
 
-//inventory (holds 8 things at once and copies of an item in one slot)
-const int INVENTORY_SLOTS = 8;
-int getSlotItemId(int slot);      //item in slot 0 to 7. -1 if the slot is empty
-int getSlotItemCount(int slot);   //counts copies of anitem that are stacked in that slot
 
+// Inventory (8 slots)
+
+int  getSlotItemId(int slot);
+int  getSlotItemCount(int slot);
 bool hasItem(int itemId);
-int getItemCount(int itemId);
-bool useItem(int itemId);        // removes one and affects hp (healing or poison). buffs are handled in combat. it will return false if item unavailable
-bool addItem(int itemId);        //returns false if inventory is full
-std::string getItemName(int itemId);    // both keys return "Key"
+int  getItemCount(int itemId);
+bool useItem(int itemId);
+bool addItem(int itemId);  
+bool addItem(int itemId,int quantity);           // if more items needed to  be added once....
 
+void sortInventory(bool byCount = false);
+  
+
+std::string getItemName(int itemId);
 
 
 
@@ -63,13 +86,13 @@ int  getTotalItems();                      // total items carried (uses recursio
 const char* getItemDescription(int itemId);
 
 
-// using c strings for player naem
+// Player name (C-string)
 void setPlayerName(const char* newName);
 const char* getPlayerName();
 
 
 
-// flagss
+//progress flagss
 
 void setProgressFlag(unsigned int flag);
 void clearProgressFlag(unsigned int flag);
@@ -85,7 +108,7 @@ int findItemIdByName(const char* name);
 // starting the game from start ....
 void resetPlayerToDefault();
 
-//  Saving / loading 
+// ---------- Saving / loading ----------
 
 bool saveGameBackup(const std::string& filename ="save_backup.txt");
 bool loadGameBackup(const std::string& filename ="save_backup.txt");
@@ -94,4 +117,3 @@ bool loadGameBinary(const std::string& filename ="save_backup.bin");
 const char* getLastFileError();
 
 #endif
-

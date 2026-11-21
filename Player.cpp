@@ -48,7 +48,7 @@ static int maxAtkLevel = 3;
 static int expPoints = 0;
 static int difficulty = DIFF_NORMAL;
 static unsigned int progressFlags = 0;      // many yes/no switches stored in one number
-static char playerName[NAME_LENGTH] = "Hunter";   
+static char playerName[NAME_LENGTH] = "Viktor";   
 
 // inventory has 8 things so we have 8 rows and 2 columns for id of things player may collect and and count of item like how much it has
 // we are initialising it with -1 and 0 count as -1 represent that its empty.....
@@ -288,6 +288,41 @@ bool addItem(int itemId, int quantity) {
 // OVERLOADING again, this one adds just one item if u dont addd quantity
 bool addItem(int itemId) {
     return addItem(itemId, 1);
+}
+
+//sorting thingyy............
+// ---------- Sorting the inventory (Bubble Sort) ----------
+
+static void swapSlots(int a, int b) {
+    int tempId = slot[a][ID];
+    int tempCount = slot[a][COUNT];
+    slot[a][ID] = slot[b][ID];
+    slot[a][COUNT] = slot[b][COUNT];
+    slot[b][ID] = tempId;
+    slot[b][COUNT] = tempCount;
+}
+
+static bool isWrongOrder(int a, int b, bool byCount) {
+    bool aEmpty = (slot[a][COUNT] == 0);
+    bool bEmpty = (slot[b][COUNT] == 0);
+
+    if (aEmpty) return !bEmpty;          // empty slots always go last
+    if (bEmpty) return false;
+    if (byCount) return slot[a][COUNT] < slot[b][COUNT];
+    return strcmp(itemNames[slot[a][ID]], itemNames[slot[b][ID]]) > 0;   // A to Z
+}
+
+void sortInventory(bool byCount) {
+    bool swapped = true;
+    while (swapped) {
+        swapped = false;
+        for (int i = 0; i < INVENTORY_SLOTS - 1; i++) {
+            if (isWrongOrder(i, i + 1, byCount)) {
+                swapSlots(i, i + 1);
+                swapped = true;
+            }
+        }
+    }
 }
 
 
@@ -549,7 +584,7 @@ bool loadGameBinary(const string& filename) {
         }
         in.close();
 
-        newName[NAME_LENGTH - 1] = '\0';                // making sure the text ends
+        newName[NAME_LENGTH - 1] = '\0';                // makingRR sure the text ends
         checkLoadedData(h, mh, lv, atk, ex, diff, bag); // may throw
         useLoadedData(h, mh, lv, atk, ex, diff, flags, bag);
         strcpy(playerName, newName);
