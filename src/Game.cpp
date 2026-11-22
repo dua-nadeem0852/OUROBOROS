@@ -207,16 +207,11 @@ static void afterBattle()
 //what to do after a step or an E press on the map
 static void handleMapResult(int result)
 {
-    //traps and holes hurt, so they get the same "ouch" as in a fight. if it kills the player we play the defeat sound instead
-    bool hurtOnMap = (result == RESULT_TRAP || result == RESULT_HOLE);
-
     if (isPlayerDead())              //a trap or a hole can deal damage essentially/take away health
     {
-        playEffect(SND_DEFEAT);
         goGameOver();
         return;
     }
-    if (hurtOnMap) playEffect(SND_PLAYER_HURT);
 
     if (result == RESULT_ENEMY)
     {
@@ -401,9 +396,7 @@ static void bagKey(sf::Keyboard::Key key)
     {
         int id = getSlotItemId(bagIndex);
         bool used = (id == ITEM_HEALING_POTION && getPlayerHP() < getPlayerMaxHP());
-        //drinking a potion plays the healing sound, everything else that does nothing plays the "not allowed" sound
-        if (used) playEffect(SND_HEAL);
-        else      playUiSound(UI_SOUND_BACK);
+        playUiSound(used ? UI_SOUND_SELECT : UI_SOUND_BACK);     //only drinking a potion counts as "done"
         if (id < 0)
         {
             bagNotice = "That slot is empty.";
@@ -529,5 +522,6 @@ int runGame()
         }
         window.display();
     }
+    shutdownSound();        //free the sounds and music before closing (stops the OpenAL cleanup warning)
     return 0;
 }
