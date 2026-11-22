@@ -24,6 +24,14 @@ Programming Fundamenals project, **Group 8** . (FAST NUCES-2026)
 The game must be started from the **project root** (the folder that contains `assets/`), the build script already does this.
 Do not move `ouroboros.exe` away from `assets/`.
 
+## Download ZIP from github
+
+1. Extract into a new folder.
+2. Go to scripts, then double click `build_game`.
+3. Give the required permissions.
+4. Once this runs, the `ouroboros.exe` will be built (outside the sub-folders).
+5. You can either run it through the `build_game` (will have to give permission every time), but application is preferred, so simply double clicking the `ouroboros.exe` will run the application (no need to give permission every time).
+
 ## Controls
 
 | Where | Keys |
