@@ -1,6 +1,6 @@
-// Player.cpp - WHAT THIS FILE DOES: the player's hp, level, exp, bag/items, difficulty and the save/load of those (Zarnib's part)
+// - WHAT THIS FILE DOES: the player's hp, level, exp, bag/items, difficulty and the save/load of those (Zarnib's part)
 #include "PlayerInterface.h"
-#include <fstream>      // for reading and writing files
+#include <fstream>      // for reading and writing files.....
 #include <cstring>    
 using namespace std;
 
@@ -58,7 +58,7 @@ struct Item {
     int quantity;
 };
 
-// inventory has 8 slots. -1 / "" / 0 means that the slot is empty
+// inventory has 8 slots. -1 / "" / 0 means that the slot is emptyy...
 static Item slot[INVENTORY_SLOTS] = {
     {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}
 };
@@ -128,7 +128,8 @@ bool isPlayerDead() { return hp <= 0; }    //if helath becomes 0.........
 int getEnemyStrengthPercent() { return difficultyTable[difficulty][1]; }   //user will enter the difficulty level and accordin to above mentioned grid enemy strength will be found and given to it from 1st column
 int getTotalItems() { return totalItemsInBag(slot, INVENTORY_SLOTS); }
 
-// Changing the player's stats according to the level of game
+
+//changing the stats of player according ot the level it has......
 
 // Difficulty change damage like on hard: 10 * 150 / 100 = 15.
 void takeDamage(int amount) {
@@ -141,7 +142,7 @@ void takeDamage(int amount) {
     }
     hp = hp - relDamage;
     if (hp < 0) {
-        hp = 0;                         // hp cant go below 0
+        hp = 0;                         // as hp cant go below 0....
     }
 }
 
