@@ -85,9 +85,10 @@ Moreover, there is the initial code I wrote without using SFML (Map Setup (witho
 ~ ~ ~ What's left ~ ~ ~
 • Player control movements: connect the movement keys so the player moves in four directions, using the existing boundary and blocked-tile checks
 • Include the enemy into the grid: place enemy tiles on the map and show them on screen
-• a sound affect when the player the tile or collects a relic
 
-____________________________________________________________________________________________________________________**Member 2 (26L-0769) :**_____________
+____________________________________________________________________________________________________________________
+
+**Member 2 (26L-0769) :**_____________
 i worked on the player data, inventory system, items and game progression.
  
 
@@ -112,6 +113,8 @@ shared player/inventory data structures, item identifiers, and function declarat
 File                    What it does
 player.cpp:             Main player logic. Handles stats, damage/healing, EXP, level-ups, difficulty, and save/load file handling
 PlayerInterface.h:               Header for the player system. Declares player/inventory data structures, item IDs, and functions
+
+____________________________________________________________________________________________________________________
 
 # PROJECT PROPOSAL
 OUROBOROS is a 2D GUI-based exploration and adventure game developed in C++ using the SFML
