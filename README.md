@@ -6,7 +6,7 @@ traps, beat the guardians and work out which key really opens the chest.
 
 Programming Fundamenals project, **Group 8** . (FAST NUCES-2026)
 
-├── old/ earlier files from before the merge, kept for reference (not part of the build).
+| old/ earlier files from before the merge, kept for reference (not part of the build). |
 
 | Part | Who |
 |---|---|
