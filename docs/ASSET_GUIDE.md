@@ -175,12 +175,20 @@ Where each path lives: map pictures `src/Map.cpp` - item icons (bag + battle) `s
 
 ## 9. Credits and licences
 
-The credits screen text is in `src/Story.cpp` and still has a placeholder line for assets. Before hand-in list the author and source
-of every picture, sound, song, font and the menu video you did not make yourselves (and make sure you may use them).
+The credits screen text is in `src/Story.cpp` (`CREDITS_LINES`). Where the assets come from:
+
+| Assets | Source |
+|---|---|
+| pictures, sprites, backgrounds, menu video, music and most sound effects | AI-generated with ChatGPT |
+| `sounds/hit.wav` (attack / sword slash swoosh) | Mixkit |
+| `sounds/wail.wav` (Hydra wail, monster scream) and `sounds/hurt.wav` (pain grunt) | UpperBeat |
+| `fonts/game.ttf` | Crimson Text, SIL Open Font License (`fonts/OFL.txt`) |
+
+If you replace one of these files with something from another source, add it here and in the credits.
 
 ## 10. Still to add
 
 - [ ] `battle_0` and `battle_1` music (Scientist and Bat fights; they play the shared `battle` song or nothing until added)
 - [x] `assets/fonts/game.ttf` (Crimson Text, credited in `src/Story.cpp`)
-- [ ] credits filled in
+- [x] credits filled in (`src/Story.cpp`, section 9)
 - [ ] optional: more map sounds (picking things up, the chest, level-up, footsteps)

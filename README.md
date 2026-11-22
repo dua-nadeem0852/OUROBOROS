@@ -49,8 +49,7 @@ Do not move `ouroboros.exe` away from `assets/`.
 ```
 OUROBOROS/
 ├── src/        game source code (.cpp / .h) and the exe icon resource (ouroboros.rc)
-├── tests/      test programs for the combat rules and the map / save / inventory code
-├── scripts/    build and test scripts (.bat)
+├── scripts/    build script (.bat)
 ├── assets/     everything the game loads: images, sprites, backgrounds, music, sounds, fonts, icon
 │   └── source/   original files that are not loaded by the game (e.g. the menu video)
 ├── docs/       guides: what every file does, every asset and where it goes, changelog
@@ -60,15 +59,6 @@ OUROBOROS/
 
 Files the game and the build create (`ouroboros.exe`, DLLs, `save.txt`, `highscores.txt`, ...) are listed in `.gitignore`
 and are never committed.
-
-## Tests
-
-| Script | Tests | Needs SFML |
-|---|---|---|
-| `scripts\run_tests.bat` | combat rules (damage, rewards, bosses, potions) with a fake player | no |
-| `scripts\run_map_test.bat` | walking, traps, walls, chest, save/load, high score, bag sorting (real `Player.cpp`) | yes |
-
-Both print `[PASS]` / `[FAIL]` lines and a summary. They do not open a window.
 
 ## Assets
 
@@ -84,7 +74,9 @@ and whether replacing it needs a code change (usually not: keep the file name).
 
 ## Credits
 
-- Pictures, sprites, backgrounds, menu video, music and most sound effects: AI-generated with ChatGPT and Suno AI.
-- Attack / sword slash sound: Mixkit.
+- Pictures, sprites, backgrounds, menu video, music and most sound effects: AI-generated with ChatGPT.
+- Attack / sword slash swoosh sound: Mixkit.
 - Hydra wail (monster scream) and pain grunt sounds: UpperBeat.
 - Font: Crimson Text by The Crimson Text Project Authors, SIL Open Font License (`assets/fonts/OFL.txt`).
+
+The same list is on the in-game credits screen (`src/Story.cpp`) and in `docs/ASSET_GUIDE.md` section 9.

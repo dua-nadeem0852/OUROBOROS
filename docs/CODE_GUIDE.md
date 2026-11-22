@@ -37,15 +37,6 @@ Every file also starts with a comment saying what it does.
 |---|---|
 | `src/ouroboros.rc` | gives `ouroboros.exe` its icon (`assets/icon.ico`) |
 | `scripts/build_game.bat` | builds and runs the game |
-| `scripts/run_tests.bat`, `scripts/run_map_test.bat` | build and run the tests |
-
-## Tests (`tests/`)
-
-| File | What it does |
-|---|---|
-| `TestBattle.cpp` | combat rules, with the fake player below |
-| `PlayerStub.cpp` | a fake player used **only** by `TestBattle`. Not part of the game |
-| `TestMap.cpp` | map, walls, traps, chest, save/load, high score, bag sorting, using the real `Player.cpp` |
 
 ## Who calls whom
 

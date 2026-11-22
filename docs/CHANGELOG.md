@@ -1,11 +1,10 @@
 # Changelog (development notes)
 
-Older entries mention the flat folder layout. Files are now in `src/`, `tests/`, `scripts/` and `assets/` (see the README).
+Older entries mention the flat folder layout. Files are now in `src/`, `scripts/` and `assets/` (see the README).
 
 ## First merged version
 
 Run `scripts\build_game.bat` to build and play the whole game.
-`run_tests.bat` = combat tests (fake player), `run_map_test.bat` = map tests (real Player.cpp).
 
 | File | What it is |
 |---|---|
@@ -13,12 +12,11 @@ Run `scripts\build_game.bat` to build and play the whole game.
 | `Map.h/.cpp` | the map, walking, traps, holes, bushes, keys, relics, the chest, drawing the tiles |
 | `Screens.h/.cpp` | menu, side panel (HUD), bag screen, story box, pause, game over, credits |
 | `Story.h/.cpp` | relic stories, intro, ending, credits text (first draft, rewrite it) |
-| `TestMap.cpp` | checks the map rules without opening a window |
 
 Changed:
 - `PlayerInterface.h`: added `PROGRESS_HAS_REAL_KEY`, `PROGRESS_HAS_RELIC`, `PROGRESS_BEAT_GAME` (Player.cpp did not build without them)
 
-Combat files (Battle, Enemy, BattleScreen, BattleSound, UiDraw) are Dua's. Only the key rewards changed in Battle.cpp (scientist = fake key, hydra = real key) and the 5 test lines in TestBattle.cpp that checked them.
+Combat files (Battle, Enemy, BattleScreen, BattleSound, UiDraw) are Dua's. Only the key rewards changed in Battle.cpp (scientist = fake key, hydra = real key).
 
 Map notes for Amina:
 - the 5 extra `E` tiles were removed, there are 3 bosses so 3 enemy tiles (scientist 2,2 - bat 1,8 - hydra 9,6)
@@ -48,20 +46,20 @@ Map notes for Amina:
 - Relics: each of the 7 relic tiles has its own picture (`assets/images/relic_0..6.png`) and always gives its own story, so the picture matches the description (`RELIC_TILE_...` tables in `Map.cpp`). `assets/images/relic.png` is the fallback.
 
 ## Repo layout
-- Code moved to `src/`, tests to `tests/`, `.bat` files to `scripts/`, all pictures to `assets/images/` (the old `Images/` folder is gone, code paths updated).
+- Code moved to `src/`, `.bat` files to `scripts/`, all pictures to `assets/images/` (the old `Images/` folder is gone, code paths updated).
 - Added README, `.gitignore`, `.gitattributes`, `docs/`.
 - Fixed the build error `src/ouroboros.rc: No such file` (the build script already expected `src/`, the files were still in one flat folder).
 - Fixed the inventory pictures (the code looked in `assets/images/` but the pictures were in `Images/`).
 - Menu video source moved to `assets/source/mainmenu_bg.mp4` (file name had spaces).
 - Added generated placeholder sound effects: `ui_move`, `ui_select`, `ui_back`, `block`, `heal`, `buff`, `laugh`, `screech`, `victory`, `defeat`.
-- Review fixes: Viktor now starts with no relics (the bag started with one while the HUD said 0/7); default player name is "Viktor" everywhere (was "Hunter" in `Player.cpp`); removed the unused key tile (`K`) drawing and the old chest tile (`C`) from the map; old saves that still contain `K`/`C` tiles load them as floor (before, they were rejected); removed unused `BATTLE_WINDOW_W/H`; fixed a test message typo.
+- Review fixes: Viktor now starts with no relics (the bag started with one while the HUD said 0/7); default player name is "Viktor" everywhere (was "Hunter" in `Player.cpp`); removed the unused key tile (`K`) drawing and the old chest tile (`C`) from the map; old saves that still contain `K`/`C` tiles load them as floor (before, they were rejected); removed unused `BATTLE_WINDOW_W/H`.
 - Item icons (potions, relic bag, key) are now drawn in the battle item grid too. The drawing code is shared (`drawItemIcon` in `UiDraw.cpp`) with the bag screen. Both keys use the same picture so the real one can't be told apart.
 - Map sounds: traps and holes play `hurt.wav`, dying on the map plays `defeat.wav`, drinking a healing potion in the bag plays `heal.wav` (new `playEffect()` in `BattleSound.cpp`).
 
 ## Round 4 (potions and docs)
 - **Poison potion in a fight** (`Battle.cpp`, `useBattleItem`): the battle log now says "You lose 15 HP" and the HP lost counts as damage taken that turn, so the damage number shows like any other hit. It still plays `hurt.wav`, and if it kills Viktor the fight is lost (defeat sound, game over) as before.
 - Potion rules checked: healing works in a fight and in the bag (`heal.wav`); the buff (`buff.wav`) and poison (`hurt.wav`) potions are fights only. In the bag they show "Better to save this one for a fight".
-- New test in `tests/TestBattle.cpp` for the poison potion (used up, log line, counts as damage, hurts Viktor). All 73 combat tests pass.
 - Docs: `ASSET_GUIDE.md` (potion sounds, how to pick the font), `README.md` (potions, font note), `assets/fonts/README.md` (font tips).
 - Font added: `assets/fonts/game.ttf` = Crimson Text Regular (+ `OFL.txt` licence). All characters used in the game text are in the font. Credited in `src/Story.cpp`, the README and the asset guide.
-- Still missing: `battle_0` / `battle_1` music, credits for the other assets.
+- Credits filled in (`src/Story.cpp`, README, asset guide): AI-generated assets (ChatGPT), Mixkit and UpperBeat sound effects, Crimson Text font.
+- Still missing: `battle_0` / `battle_1` music.

@@ -70,7 +70,7 @@ int  getLastRelicIndex();                      // which relic (0, 1, 2...) was f
 
 bool saveMapState(const std::string& filename);   // see SaveSystem.cpp, saves tiles, position, beaten bosses
 bool loadMapState(const std::string& filename);   // false if the file is missing or looks broken
-bool everythingReachable();                       // true if walls don't cut anything off (used by TestMap)
+bool everythingReachable();                       // true if walls don't cut anything off
 
 void drawMap(sf::RenderWindow& window, const sf::Font& font);
 

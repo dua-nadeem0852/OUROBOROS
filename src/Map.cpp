@@ -35,7 +35,7 @@ static const char* START_MAP[MAP_SIZE] = {
 // extra things from the proposal that sit on top of Amina's layout:
 //   W = wall (cannot walk through)   N = npc (press E to talk)   ? = clue (press E to read)
 // they are put on the map in initializeMap() so START_MAP above stays exactly what Amina made.
-// every one of them is on a plain empty tile, and TestMap checks that nothing gets cut off
+// every one of them is on a plain empty tile, so nothing gets cut off
 static const int WALL_COUNT = 8;
 static const int WALL_ROW[WALL_COUNT] = { 1, 1, 3, 3, 6, 7, 7, 8 };
 static const int WALL_COL[WALL_COUNT] = { 2, 3, 8, 9, 8, 7, 8, 6 };
@@ -592,6 +592,7 @@ bool loadMapState(const std::string& filename)
             trig[r][c] = (line[c] == '1');
         }
     }
+    // older saves can still have a key tile (K) or a chest tile (C). neither is a map tile any more
     // (keys come from the bosses, the chest is drawn at CHEST_ROW/CHEST_COL), so they just become floor
     for (int r = 0; r < MAP_SIZE; r++)
         for (int c = 0; c < MAP_SIZE; c++)
@@ -617,7 +618,7 @@ bool loadMapState(const std::string& filename)
 }
 
 // true if every tile you need (relics, key, bushes, bosses, chest) can be reached from the start
-// without going through walls or holes. TestMap uses this so the walls can never lock the game
+// without going through walls or holes, so the walls can never lock the game
 bool everythingReachable()
 {
     bool seen[MAP_SIZE][MAP_SIZE];

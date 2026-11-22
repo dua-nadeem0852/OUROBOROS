@@ -7,13 +7,11 @@
 # SFML / compiler runtime DLLs: scripts/build_game.bat copies them next to the exe
 *.dll
 
-# ---- files the game and the tests write while running ----
+# ---- files the game writes while running ----
 save.txt
 save.txt.map
 highscores.txt
 unlocked.txt
-test_save*
-test_scores*
 
 # ---- editor / OS junk ----
 .vscode/
