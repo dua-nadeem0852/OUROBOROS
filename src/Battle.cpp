@@ -1,3 +1,4 @@
+//DUA NADEEM 26L-0852 member 3
 //Battle.cpp - WHAT THIS FILE DOES: the combat rules. turns, damage, the 3 bosses' attacks, rewards and the sound queue. no drawing here (see BattleScreen.cpp)
 #include "Battle.h"
 #include "Enemy.h"
