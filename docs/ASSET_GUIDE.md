@@ -96,11 +96,9 @@ SFML can't play mp4, so the menu "video" is a folder of numbered pictures shown 
 | `menu.wav` (or `.ogg` / `.flac`) | main menu and credits | OK |
 | `explore.wav` (or `.ogg` / `.flac`) | walking around, bag, story boxes | OK |
 | `battle_2.ogg` | Hydra fight | OK |
-| `battle_0.ogg` | Scientist fight | MISSING |
-| `battle_1.ogg` | Bat fight | MISSING |
-| `battle.ogg` | shared battle song for any boss without its own | optional |
+| `battle_0.ogg` | Scientist fight | OK |
+| `battle_1.ogg` | Bat fight | OK |
 
-- `.ogg` is tried first, then `.wav`, then `.flac`. Prefer `.ogg` (much smaller). If you have both an `.ogg` and a `.wav` of the same track, delete the `.wav`.
 - Music loops. The game over screen is silent on purpose. After a fight the exploration song comes back by itself.
 - Volume: `MUSIC_VOLUME` (0-100) at the top of `src/BattleSound.cpp`.
 
@@ -183,12 +181,3 @@ The credits screen text is in `src/Story.cpp` (`CREDITS_LINES`). Where the asset
 | `sounds/hit.wav` (attack / sword slash swoosh) | Mixkit |
 | `sounds/wail.wav` (Hydra wail, monster scream) and `sounds/hurt.wav` (pain grunt) | UpperBeat |
 | `fonts/game.ttf` | Crimson Text, SIL Open Font License (`fonts/OFL.txt`) |
-
-If you replace one of these files with something from another source, add it here and in the credits.
-
-## 10. Still to add
-
-- [ ] `battle_0` and `battle_1` music (Scientist and Bat fights; they play the shared `battle` song or nothing until added)
-- [x] `assets/fonts/game.ttf` (Crimson Text, credited in `src/Story.cpp`)
-- [x] credits filled in (`src/Story.cpp`, section 9)
-- [ ] optional: more map sounds (picking things up, the chest, level-up, footsteps)
