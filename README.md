@@ -77,6 +77,7 @@ and whether replacing it needs a code change (usually not: keep the file name).
 - Pictures, sprites, backgrounds, menu video, music and most sound effects: AI-generated with ChatGPT.
 - Attack / sword slash swoosh sound: Mixkit.
 - Hydra wail (monster scream) and pain grunt sounds: UpperBeat.
+- Scientist battle theme (`assets/music/battle_0.ogg`): composed with Claude (Anthropic).
 - Font: Crimson Text by The Crimson Text Project Authors, SIL Open Font License (`assets/fonts/OFL.txt`).
 
-The same list is on the in-game credits screen (`src/Story.cpp`) and in `docs/ASSET_GUIDE.md` section 9.
+The same list is on the in-game credits screen (`src/Story.cpp`) and in `docs/ASSET_GUIDE.md` 
