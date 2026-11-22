@@ -94,7 +94,7 @@ SFML can't play mp4, so the menu "video" is a folder of numbered pictures shown 
 | File | Plays when | Status |
 |---|---|---|
 | `menu.wav` (or `.ogg` / `.flac`) | main menu and credits | OK |
-| `explore.wav` (or `.ogg` / `.flac`) | walking around, bag, story boxes | OK |
+| `explore.ogg` (or `.wav` / `.flac`) | walking around, bag, story boxes | OK |
 | `battle_2.ogg` | Hydra fight | OK |
 | `battle_0.ogg` | Scientist fight | OK |
 | `battle_1.ogg` | Bat fight | OK |
