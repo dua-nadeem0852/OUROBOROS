@@ -36,7 +36,7 @@ int getplayerAtkLevel();
 int getPlayerMaxAttackLevel();  //to be decided
 int getDifficulty();
 
-//update player stats                            (zarnib should keep HP within 0 to max hp inside these)
+//update player stats                            (one should keep HP within 0 to max hp inside these)
 void takeDamage(int amount);
 void healPlayer(int amount);
 void addExperience(int amount);
