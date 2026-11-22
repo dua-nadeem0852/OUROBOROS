@@ -4,7 +4,9 @@ A small story-driven exploration and boss-battle game written in **C++ with SFML
 You play Viktor, lost in a fogged 10x10 ruin: find the relics that piece the story together, survive the
 traps, beat the guardians and work out which key really opens the chest.
 
-University project, **Group 8** (Fundamentals of Programming).
+Programming Fundamenals project, **Group 8** . (FAST NUCES-2026)
+
+├── old/ earlier files from before the merge, kept for reference (not part of the build).
 
 | Part | Who |
 |---|---|
