@@ -84,5 +84,7 @@ and whether replacing it needs a code change (usually not: keep the file name).
 
 ## Credits
 
-Font: Crimson Text by The Crimson Text Project Authors, SIL Open Font License (`assets/fonts/OFL.txt`). Still to add: the author and source of every other asset you did not make yourselves (pictures, sounds, music, menu video)
-here **and** in `Story.cpp` (the credits screen). Licence: not chosen yet.
+- Pictures, sprites, backgrounds, menu video, music and most sound effects: AI-generated with ChatGPT and Suno AI.
+- Attack / sword slash sound: Mixkit.
+- Hydra wail (monster scream) and pain grunt sounds: UpperBeat.
+- Font: Crimson Text by The Crimson Text Project Authors, SIL Open Font License (`assets/fonts/OFL.txt`).
