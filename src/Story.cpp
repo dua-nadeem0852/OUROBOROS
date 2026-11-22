@@ -56,7 +56,7 @@ static const std::string CREDITS_LINES[] = {
     "Hydra wail (monster scream) and pain grunt: UpperBeat",
     "",
     "Font: Crimson Text by The Crimson Text Project Authors",
-    "(SIL Open Font License)",",
+    "(SIL Open Font License)",
     "",
     "Thank you for playing :)"
 };
