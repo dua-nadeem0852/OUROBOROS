@@ -88,11 +88,9 @@ Moreover, there is the initial code I wrote without using SFML (Map Setup (witho
 
 ____________________________________________________________________________________________________________________
 
-**Member 2 (26L-0769) :**_____________
-i worked on the player data, inventory system, items and game progression.
- 
+**Member 2 (26L-0769) :**
 
- all the core C++ player mechanics have been implemented. All that's really left is hooking everything up smoothly with the map exploration and combat states so stats update in real time across the whole game.
+I worked on the player data, inventory system, items and game progression. All the core C++ player mechanics have been implemented. All that's really left is hooking everything up smoothly with the map exploration and combat states so stats update in real time across the whole game.
 
 player stats:
 current hp, max hp, attack, exp, and level tracking along with taking damage and restoring health within proper limits
@@ -105,7 +103,6 @@ exp rewards, level-up stat increases, and menu difficulty settings adjusting pla
 
 file handling:
 saving and loading game progress, completion records, or high scores
-
 
 handover:
 shared player/inventory data structures, item identifiers, and function declarations with the group so combat and map events read/update stats properly
