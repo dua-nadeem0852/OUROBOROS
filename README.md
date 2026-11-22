@@ -10,9 +10,9 @@ Programming Fundamenals project, **Group 8** . (FAST NUCES-2026)
 
 | Part | Who |
 |---|---|
-| Map, exploring, tiles | Amina |
-| Player, inventory, save data | Zarnib |
-| Combat, battle screen, sound | Dua |
+| Map, exploring, tiles | Amina (26L-0760) |
+| Player, inventory, save data | Zarnib (26L-0769) |
+| Combat, battle screen, sound | Dua (26l-0852) |
 
 ## Quick start (Windows)
 
