@@ -1,245 +1,88 @@
 # OUROBOROS
 
-# IMPLEMENTATION
-sfml version used: 2.6.2
+A small story-driven exploration and boss-battle game written in **C++ with SFML 2.6.2**.
+You play Viktor, lost in a fogged 10x10 ruin: find the relics that piece the story together, survive the
+traps, beat the guardians and work out which key really opens the chest.
 
-**Member 3 (26L-0852) :**
-I made the whole New_Combat folder. (accidentally forgot to submit the whole folder and so there exists some of its files outside the folder, i didn't delete them just in case the TA would ask for why those files are deleted).
+University project, **Group 8** (Fundamentals of Programming).
 
-So far, all the combat mechanics have been implemented. All that's really left is to make the game look prettier by adding backgrounds etc and sounds. I have implemented a few just to test things out, so they're more of placeholders while some will stay in the game when finalized.
+| Part | Who |
+|---|---|
+| Map, exploring, tiles | Amina |
+| Player, inventory, save data | Zarnib |
+| Combat, battle screen, sound | Dua |
 
-basic combat for the player:
-attack, defend, use item, run(decoy)
+## Quick start (Windows)
 
-items:
-potions for healing, buffs and poisoning
+1. Install **MinGW-w64** (g++ and windres, default folder `C:\mingw64`) and **SFML 2.6.2 for MinGW** (default folder `C:\SFML-2.6.2`).
+   If yours are somewhere else, set the `MINGW` and `SFML` environment variables or edit the top of `scripts\build_game.bat`.
+2. Clone the repo and double-click **`scripts\build_game.bat`** (or run it from the project root in PowerShell: `.\scripts\build_game.bat`).
+   It copies the DLLs next to the exe, builds the icon and the game, and starts it.
 
-boss specific mechanics:
-the mad scientist basically consumes his own hp to buff his attacks, rng handles that
-the humanoid bat can summon other bats for extra damage
-the human hydra has a wail mechanic that essentially does more attack, it is triggered every two turns of the hydra. all the heads of hydra cannot perform the same action (heal, attack, defend) in one turn but two can.
+The game must be started from the **project root** (the folder that contains `assets/`), the build script already does this.
+Do not move `ouroboros.exe` away from `assets/`.
 
-exp, rewards etc:
-attack levels and other things like reward handling and exp have been implemented as well.
+## Controls
 
-dialogue:
-the mad scientist's (boss 1) dialogue has been handled, the other two bosses can't really speak so no dialogue for them.
+| Where | Keys |
+|---|---|
+| Menu | Up / Down move, Left / Right change difficulty or screen mode, Enter choose |
+| Exploring | WASD or arrows move, **E** interact (pick up, talk, read, open), **I** bag, **Esc** pause |
+| Pause | **S** save, **M** quit to menu, Esc resume |
+| Bag | arrows move, Enter use, **S** sort A-Z, Esc / I close |
+| Battle | Up / Down choose an action, Enter confirm, Left / Right pick a head (Hydra), Esc back |
+| Anywhere | **F11** fullscreen. The window can also be resized, the game scales to any screen |
 
-sound and ui:
-i added code to change the pitch sometimes like when the player (viktor) is hurt
-and have to just add the other sound effects that will be played when they are called.
-implemented a boss theme as well (hydra)
+## Features
 
-testing:
-i have a demo made to test the combat (exe so github wont let me upload it)
+- Fog of war map with hidden traps and holes, bushes with potions, walls, NPCs and clue tiles
+- 7 relics, each with its own picture and story
+- 3 boss battles (Mad Scientist, Humanoid Bat, Hydra) with their own music and sounds
+- Inventory with potions and keys, sortable with a bubble sort
+- Potions: healing works anywhere (fight or bag); buff (+50% damage for 3 rounds) and poison (-15 HP) are for fights only
+- 3 difficulties (Hard unlocks after beating the game on Normal)
+- Save / Continue, score and high score
+- Menu, exploration and battle music, UI sounds
 
+## Project layout
 
-File	                                          What it does
-Battle.cpp:	    Main battle system. Handles player turns, attacks, defending, items, boss turns, rewards and battle outcomes.
+```
+OUROBOROS/
+├── src/        game source code (.cpp / .h) and the exe icon resource (ouroboros.rc)
+├── tests/      test programs for the combat rules and the map / save / inventory code
+├── scripts/    build and test scripts (.bat)
+├── assets/     everything the game loads: images, sprites, backgrounds, music, sounds, fonts, icon
+│   └── source/   original files that are not loaded by the game (e.g. the menu video)
+├── docs/       guides: what every file does, every asset and where it goes, changelog
+├── README.md
+├── .gitignore  .gitattributes
+```
 
-Battle.h:      	Header for the battle system. Declares battle functions, actions, states and constants.
+Files the game and the build create (`ouroboros.exe`, DLLs, `save.txt`, `highscores.txt`, ...) are listed in `.gitignore`
+and are never committed.
 
-BattleDemo.cpp:	Main program that launches the battle demo and creates the game window.
+## Tests
 
-BattleScreen.cpp:	Handles the visual battle screen, including backgrounds, characters, animations, health bars and menus.
+| Script | Tests | Needs SFML |
+|---|---|---|
+| `scripts\run_tests.bat` | combat rules (damage, rewards, bosses, potions) with a fake player | no |
+| `scripts\run_map_test.bat` | walking, traps, walls, chest, save/load, high score, bag sorting (real `Player.cpp`) | yes |
 
-BattleScreen.h:	  Declares the functions and screen dimensions used by the battle screen.
+Both print `[PASS]` / `[FAIL]` lines and a summary. They do not open a window.
 
-BattleSound.cpp:	 Handles background music and sound effects during battles.
+## Assets
 
-BattleSound.h:    Declares the sound and music functions.
+A few files are still missing (the Scientist and Bat battle music). The game stays silent for a
+missing sound instead of crashing. **`docs/ASSET_GUIDE.md`** lists every asset, its exact path, what is still missing
+and whether replacing it needs a code change (usually not: keep the file name).
 
-Enemy.cpp:      Handles enemy statistics, health, damage, special abilities and defeated-boss tracking.
+## More docs
 
-Enemy.h:	        Declares enemy types, enemy-related constants and functions.
+- [`docs/CODE_GUIDE.md`](docs/CODE_GUIDE.md) - what every source file does
+- [`docs/ASSET_GUIDE.md`](docs/ASSET_GUIDE.md) - every image, sound and music file
+- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) - what changed between versions
 
-PlayerInterface.h:	   Defines the interface between the battle system and the player's stats and inventory.
+## Credits
 
-PlayerStub.cpp:    	Temporary implementation of player statistics and inventory for testing the battle system.
-
-UiDraw.cpp:	    Contains reusable drawing functions for text, panels, health bars, sprites and other visual elements.
-
-UiDraw.h:	      Declares the drawing helper functions used by UiDraw.cpp.
-
-TestBattle.cpp:	 Contains automated tests to check whether the battle system works correctly.
-
-the assets are pretty self explanatory
-_________________________________________________________________________________________________________________________________
-
-**Member 1 (26L-0760) :**
-
-I made the folder named "Images" which consists of the pictures I have used for my gaming map layout.
-Moreover, there is the initial code I wrote without using SFML (Map Setup (without SFML)) and later I even added the code where I have implemented SFML to it (Map setup & Player Movements) along with its cpp file (Map & Player Setup.cpp).
-
-~ ~ ~ What I did ~ ~ ~
-• Made the map using a 2D array
-• Set tile types for empty ground, bush, traps, holes, treasure, and important locations
-• Stored the player's row and column
-• Added boundary checks and tiles which have been already visitied
-• Tracked visited and revealed tiles
-• Added tile interaction so the game can tell what's on the current tile
-• Wrote and tested the map setup/initialization functions
-• Displayed the grid and tile graphics in SFML
-• Drew the player sprite at the correct grid position
-
-~ ~ ~ What's left ~ ~ ~
-• Player control movements: connect the movement keys so the player moves in four directions, using the existing boundary and blocked-tile checks
-• Include the enemy into the grid: place enemy tiles on the map and show them on screen
-
-____________________________________________________________________________________________________________________
-
-**Member 2 (26L-0769) :**_____________
-i worked on the player data, inventory system, items and game progression.
- 
-
- all the core C++ player mechanics have been implemented. All that's really left is hooking everything up smoothly with the map exploration and combat states so stats update in real time across the whole game.
-
-player stats:
-current hp, max hp, attack, exp, and level tracking along with taking damage and restoring health within proper limits
-
-inventory & items:
-collecting, checking, and using keys, relics, health items, and special items
-
-progression & difficulty:
-exp rewards, level-up stat increases, and menu difficulty settings adjusting player/enemy scaling according to levels
-
-file handling:
-saving and loading game progress, completion records, or high scores
-
-
-handover:
-shared player/inventory data structures, item identifiers, and function declarations with the group so combat and map events read/update stats properly
-
-File                    What it does
-player.cpp:             Main player logic. Handles stats, damage/healing, EXP, level-ups, difficulty, and save/load file handling
-PlayerInterface.h:               Header for the player system. Declares player/inventory data structures, item IDs, and functions
-
-____________________________________________________________________________________________________________________
-
-# PROJECT PROPOSAL
-OUROBOROS is a 2D GUI-based exploration and adventure game developed in C++ using the SFML
-library. The player explores a mysterious, abandoned world through a tile-based map while searching for
-a hidden treasure chest.
-The game combines exploration, item collection, enemies, and turn-based combat. Most areas of the
-map are initially hidden, and the player gradually reveals them by moving through the environment.
-The player initially believes that the objective is simply to find the treasure. However, as the game
-progresses, they discover that there is more to this dark world than meets the eye.
-Purpose:
-The game will incorporate programming concepts covered during the course, including variables,
-conditional statements, loops, functions, arrays, 2D arrays etc where applicable and also provide a fun
-gaming experience.
-
-Objectives:
-The main objectives of the game are:
-● Explore the game world and reveal hidden areas.
-● Find clues, items, and useful relics.
-● Encounter and defeat enemies.
-● Gain experience from battles.
-● Improve the player's abilities through level ups.
-● Find the key required to progress.
-● Defeat the final Hydra boss.
-● Open the final treasure chest.
-● Discover the story and history of the mysterious world through the relics.
-Features:
-1. 2D GUI Map
-The game will use an SFML-based graphical interface with a tile-based map. Each tile can contain
-different objects, locations, enemies, traps, or items.
-
-2. Hidden and Revealed Tiles
-Most of the map will initially be hidden. As the player moves around the map, tiles will become visible.
-3. Player Movement
-The player will control the main character using keyboard controls and move through the grid.
-4. Exploration
-The player can explore different areas of the map to find enemies, clues, items, traps, and important
-locations. Even meet npcs.
-5. Inventory System
-The player will be able to collect and store items such as:
-● Keys
-● Relics
-● Health items
-● Special items
-● Story-related objects
-6. Health and Attack System
-The player will have health and attack statistics. Certain encounters and rewards can modify these
-statistics.
-7. Experience System
-Defeating enemies will make the player gain experience (exp) which will increase the player's level,
-making their attacks stronger and increase health.
-8. Turn-Based Combat
-When the player encounters an enemy, the game will enter a battle state. The player will be able to
-select actions such as:
-● Attack
-● Defend
-● Use Item
-● Run, where applicable
-The enemy will respond after the player's turn.
-9. Boss Battles
-
-The game will contain several important enemies with different purposes, the player can defeat them
-using the turn based combat system in the game.
-10. Relics and Story System
-The player will discover relics throughout the game. Relics will contain descriptions and information that
-gradually reveal the history of the world and the player's connection to it.
-11. The Treasure Chest
-After defeating the final boss, the player obtains the real key and can finally open the treasure chest. The
-contents of the chest provide the final story reveal.
-12. Game States
-The game will have multiple states, including:
-● Main Menu (including difficulty level, start game, exit etc)
-● Exploration
-● Battle
-● Inventory
-● Dialogue/Story
-● Game Over
-● Victory/Ending and then credit scene
-13. Difficulty levels
-The player first has to beat the game on the default difficulty level (normal) to unlock harder difficulty
-levels. The higher the difficulty level, the more the obstacles the player encounters.
-14. Controls
-Basic AWSD moving mechanics, E to interact, Enter for progressing the dialogue boxes, I for inventory,
-Esc for pausing etc. During battles, the player will use the designated keyboard keys to select combat
-actions.
-
-Game Rules:
-1. The player must remain within the boundaries of the game map.
-2. Hidden tiles are revealed when the player explores them.
-3. Items are collected by interacting with their corresponding tiles.
-4. Enemy encounters initiate the battle state.
-5. The player loses health when receiving damage.
-6. If the player's health reaches zero, the game enters the Game Over state.
-7. Optional enemies can be defeated to gain experience and upgrades.
-8. Find the key to the chest by exploration and defeating enemies.
-
-9. Opening the chest triggers the final story sequence.
-
-Technologies Used:
-Programming Language: C++
-Graphics/Game Library: SFML
-IDE: Visual Studio Code/Visual Studio/VS code
-Compiler: MinGW g++
-Graphics: 2D sprites and tile-based graphical assets.
-Others: Music and sound effects from external sources
-Data Storage: Text files for appropriate saved information such as high scores or game data
-
-Installation and Setup:
-● Install a C++ compiler such as MinGW.
-● Install Visual Studio Code or another suitable C++ development environment.
-● Install and configure the SFML library.
-● Download or open the project folder.
-● Ensure that the required SFML libraries and asset folders are located in the correct directories.
-● Compile the C++ source files using the configured compiler.
-● Run the resulting executable file.
-● The game will open in an SFML graphical window.
-
-Usage:
-When the game starts, the player will be presented with the main menu.
-After selecting Start Game, the player will enter the exploration map.
-The player uses the keyboard to move around the map. Hidden tiles are revealed as the player explores.
-Depending on the tile, the player may find an item, trigger a trap, discover a clue, or encounter an
-enemy.
-When an enemy is encountered, the game changes from the Exploration State to the Battle State. The
-player selects an action and the enemy responds.
-The player can return to exploration after winning a battle.
-The player can also access their inventory to view collected items and relics.
-Eventually, the player progresses toward the final encounter with the last boss and has to defeat it.
-The game then enters the Ending State, where the collected relics reveal the final story.
+Font: Crimson Text by The Crimson Text Project Authors, SIL Open Font License (`assets/fonts/OFL.txt`). Still to add: the author and source of every other asset you did not make yourselves (pictures, sounds, music, menu video)
+here **and** in `Story.cpp` (the credits screen). Licence: not chosen yet.

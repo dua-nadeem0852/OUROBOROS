@@ -1,0 +1,13 @@
+# keep line endings sane between Windows and everyone else
+* text=auto
+*.bat text eol=crlf
+*.rc  text eol=crlf
+
+# these are binary, never try to merge/diff them as text
+*.png  binary
+*.jpg  binary
+*.ico  binary
+*.wav  binary
+*.ogg  binary
+*.mp4  binary
+*.ttf  binary

@@ -1,0 +1,23 @@
+# ---- build output (everyone builds their own) ----
+*.exe
+*.o
+*.obj
+*.a
+
+# SFML / compiler runtime DLLs: scripts/build_game.bat copies them next to the exe
+*.dll
+
+# ---- files the game and the tests write while running ----
+save.txt
+save.txt.map
+highscores.txt
+unlocked.txt
+test_save*
+test_scores*
+
+# ---- editor / OS junk ----
+.vscode/
+.idea/
+*.user
+.DS_Store
+Thumbs.db
