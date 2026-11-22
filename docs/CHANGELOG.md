@@ -61,4 +61,4 @@ Map notes for Amina:
 - Potion rules checked: healing works in a fight and in the bag (`heal.wav`); the buff (`buff.wav`) and poison (`hurt.wav`) potions are fights only. In the bag they show "Better to save this one for a fight".
 - Docs: `ASSET_GUIDE.md` (potion sounds, how to pick the font), `README.md` (potions, font note), `assets/fonts/README.md` (font tips).
 - Font added: `assets/fonts/game.ttf` = Crimson Text Regular (+ `OFL.txt` licence). All characters used in the game text are in the font. Credited in `src/Story.cpp`, the README and the asset guide.
-- Credits filled in (`src/Story.cpp`, README, asset guide): AI-generated assets (ChatGPT), Mixkit and UpperBeat sound effects, Crimson Text font.
+- Credits filled in (`src/Story.cpp`, README, asset guide): AI-generated assets (ChatGPT and Claude), Mixkit and UpperBeat sound effects, Crimson Text font.
