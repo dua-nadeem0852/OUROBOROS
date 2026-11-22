@@ -1,6 +1,6 @@
 //SaveSystem.h      handles saving and loading the game + the high score list
 //WHAT THIS FILE DOES: the functions Game.cpp calls to write/read save files.
-//use Zarnib's real save functions so the player's LEVEL is saved too, and also save the map)
+//using mine  real save functions so the player's LEVEL is saved too, and also save the map)
 #ifndef SAVE_SYSTEM_H
 #define SAVE_SYSTEM_H
 #include <string>

@@ -1,4 +1,5 @@
 //SaveSystem.cpp - saving and loading the game + the high score
+//the overall save file.......
 //WHAT THIS FILE DOES: joins the three saving parts together
 //  Player.cpp (Zarnib)  saves hp, level, exp, bag, difficulty  -> save.txt
 //  Map.cpp    (Amina)   saves tiles, position, beaten bosses   -> save.txt.map
