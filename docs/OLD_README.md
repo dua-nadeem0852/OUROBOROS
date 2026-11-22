@@ -91,6 +91,7 @@ ________________________________________________________________________________
 **Member 2 (26L-0769) :**
 
 I worked on the player data, inventory system, items and game progression. All the core C++ player mechanics have been implemented. All that's really left is hooking everything up smoothly with the map exploration and combat states so stats update in real time across the whole game.
+he'll press "i" to open up his bag .
 
 player stats:
 current hp, max hp, attack, exp, and level tracking along with taking damage and restoring health within proper limits
