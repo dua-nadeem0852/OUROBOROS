@@ -74,7 +74,6 @@ void updateBattleSounds()
 }
 
 void playUiSound(int which) { playNow(SND_COUNT + which); }
-void playEffect(int soundId) { playNow(soundId); }
 void clearBattleSounds() { while (queueSound() != SND_NONE) {} }
 
 //music
@@ -122,4 +121,28 @@ void stopBattleMusic()
 {
     if (music) music->stop();
     currentTrack = "";            //so the menu/explore music can start again by itself
+}
+
+//call once when the game is closing. everything above was made with "new", so it is deleted here.
+//if we don't, OpenAL still has them open at exit and prints "alc_cleanup: 1 device not closed"
+void shutdownSound()
+{
+    for (int i = 0; i < TOTAL_SOUNDS; i++)
+    {
+        if (!sounds[i]) continue;
+        sounds[i]->stop();
+        const sf::SoundBuffer* buffer = sounds[i]->getBuffer();
+        delete sounds[i];                //the sound first, then the buffer it was using
+        delete buffer;
+        sounds[i] = 0;
+    }
+    loaded = false;
+
+    if (music)
+    {
+        music->stop();
+        delete music;
+        music = 0;
+    }
+    currentTrack = "";
 }
