@@ -62,8 +62,7 @@ and are never committed.
 
 ## Assets
 
-A few files are still missing (the Scientist and Bat battle music). The game stays silent for a
-missing sound instead of crashing. **`docs/ASSET_GUIDE.md`** lists every asset, its exact path, what is still missing
+All the assets the game needs are included. A missing sound or picture never crashes the game. **`docs/ASSET_GUIDE.md`** lists every asset, its exact path, what is still missing
 and whether replacing it needs a code change (usually not: keep the file name).
 
 ## More docs
