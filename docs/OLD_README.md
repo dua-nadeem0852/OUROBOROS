@@ -55,13 +55,11 @@ Enemy.h:	        Declares enemy types, enemy-related constants and functions.
 
 PlayerInterface.h:	   Defines the interface between the battle system and the player's stats and inventory.
 
-PlayerStub.cpp:    	Temporary implementation of player statistics and inventory for testing the battle system.
+PlayerStub.cpp:    	Temporary implementation of player statistics and inventory for testing the battle system. (removed)
 
 UiDraw.cpp:	    Contains reusable drawing functions for text, panels, health bars, sprites and other visual elements.
 
 UiDraw.h:	      Declares the drawing helper functions used by UiDraw.cpp.
-
-TestBattle.cpp:	 Contains automated tests to check whether the battle system works correctly.
 
 the assets are pretty self explanatory
 _________________________________________________________________________________________________________________________________
