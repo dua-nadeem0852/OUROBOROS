@@ -50,6 +50,7 @@ static const std::string CREDITS_LINES[] = {
     "Assets",
     "Pictures, sprites, backgrounds, menu video, music",
     "and most sound effects: AI-generated with ChatGPT",
+    "Scientist battle theme: composed with Claude",
     "",
     "Sound effects from other sources",
     "Attack / sword slash swoosh: Mixkit",
