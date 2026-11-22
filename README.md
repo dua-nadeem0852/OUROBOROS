@@ -72,7 +72,7 @@ and whether replacing it needs a code change (usually not: keep the file name).
 - [`docs/CODE_GUIDE.md`](docs/CODE_GUIDE.md) - what every source file does
 - [`docs/ASSET_GUIDE.md`](docs/ASSET_GUIDE.md) - every image, sound and music file
 - [`docs/CHANGELOG.md`](docs/CHANGELOG.md) - what changed between versions
-
+- [`docs/OLD_README.md`](docs/OLD_README.md) - older implementation logs
 ## Credits
 
 - Pictures, sprites, backgrounds, menu video, music and most sound effects: AI-generated with ChatGPT.
