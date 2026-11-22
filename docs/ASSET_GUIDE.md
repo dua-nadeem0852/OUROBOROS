@@ -180,4 +180,5 @@ The credits screen text is in `src/Story.cpp` (`CREDITS_LINES`). Where the asset
 | pictures, sprites, backgrounds, menu video, music and most sound effects | AI-generated with ChatGPT |
 | `sounds/hit.wav` (attack / sword slash swoosh) | Mixkit |
 | `sounds/wail.wav` (Hydra wail, monster scream) and `sounds/hurt.wav` (pain grunt) | UpperBeat |
+| `music/battle_0.ogg` (Scientist battle theme) | composed with Claude |
 | `fonts/game.ttf` | Crimson Text, SIL Open Font License (`fonts/OFL.txt`) |
