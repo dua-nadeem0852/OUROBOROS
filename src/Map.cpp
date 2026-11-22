@@ -592,7 +592,6 @@ bool loadMapState(const std::string& filename)
             trig[r][c] = (line[c] == '1');
         }
     }
-    // older saves can still have a key tile (K) or a chest tile (C). neither is a map tile any more
     // (keys come from the bosses, the chest is drawn at CHEST_ROW/CHEST_COL), so they just become floor
     for (int r = 0; r < MAP_SIZE; r++)
         for (int c = 0; c < MAP_SIZE; c++)
