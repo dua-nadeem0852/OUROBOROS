@@ -145,8 +145,6 @@ static std::string guardNote()
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------*/
 //starting a battle + intro dialogue
-//placeholder dialogue subjected to change maybe.
-
 static const int SCIENTIST_INTRO_LINES = 3;
 static const std::string SCIENTIST_INTRO[SCIENTIST_INTRO_LINES] = { "Ah, a visitor! Ha ha ha HA HA!",
     "Come closer, come closer... my experiments are always so eager to meet new subjects.",
