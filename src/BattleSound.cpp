@@ -75,6 +75,7 @@ void updateBattleSounds()
 }
 
 void playUiSound(int which) { playNow(SND_COUNT + which); }
+void playEffect(int soundId) { playNow(soundId); }
 void clearBattleSounds() { while (queueSound() != SND_NONE) {} }
 
 //music
