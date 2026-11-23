@@ -26,11 +26,12 @@ const int DIFF_HARD = 2;
 
 //progress switches (each one is a single bit, so they can be mixed in one number with | )
 //Player.cpp turns the first two on by itself when the item is picked up
-const unsigned int PROGRESS_HAS_REAL_KEY = 1;     //bit 0
-const unsigned int PROGRESS_HAS_RELIC    = 2;     //bit 1
-const unsigned int PROGRESS_BEAT_GAME    = 4;     //bit 2, set when the chest is opened
+const unsigned int PROGRESS_HAS_REAL_KEY = 1;     //bit 0 (001) is set one(. it will be turned on when he got real key)
+const unsigned int PROGRESS_HAS_RELIC    = 2;     //bit 1 (010) when the relic is picked up
+const unsigned int PROGRESS_BEAT_GAME    = 4;     //bit 2, itll be on when the chest is opened
 
 // functions for reading player stats.....
+
 int getPlayerHP();
 int getPlayerMaxHP();
 int getplayerAtk();          //dmg a normal atk of the player deals depending on their atk level
