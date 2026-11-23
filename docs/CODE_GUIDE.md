@@ -18,8 +18,8 @@ Every file also starts with a comment saying what it does.
 | File | What it does |
 |---|---|
 | `Map.h/.cpp` | the 10x10 map as a `Tile` array, walking, walls, hidden traps and holes, bushes, relics, NPCs, clues, the chest, saving/loading the map, drawing the tiles |
-| `PlayerInterface.h` | the list of player/bag functions everyone calls (and item / difficulty constants) |
-| `Player.cpp` | hp, level, exp, difficulty, the bag (`Item` struct, bubble sort), and saving/loading those |
+| `PlayerInterface.h` | the list of player/bag functions everyone calls (and item / difficulty constants) z...|
+| `Player.cpp` | hp, level, exp, difficulty, the bag (`Item` struct, bubble sort), and saving/loading those z... |
 | `SaveSystem.h/.cpp` | `saveGame` / `loadGame` (player + map) and the high score file |
 
 ## Combat (Dua)
