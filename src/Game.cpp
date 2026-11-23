@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-//things the game has to remember
+//things the game has to remember. these variables will stay in the memory until the game closes
 static int state = STATE_MENU;
 
 static const int MENU_ITEMS = 6;           //0 start, 1 continue, 2 difficulty, 3 screen, 4 credits, 5 exit
