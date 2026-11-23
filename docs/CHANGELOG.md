@@ -23,11 +23,11 @@ Map notes for Amina:
 - keys follow the proposal: the key tile, the Mad Scientist and the Bat give fake keys, only the Hydra (final boss) gives the real key, and only the real key opens the chest
 
 ## Added in the latest round
-- `SaveSystem.h/.cpp` (from the File Handling add-on, fixed): save/load = Zarnib's player save + the map state (`save.txt` and `save.txt.map`), plus the high score (`highscores.txt`). Add-on fixes: missing `#include <string>`, it called functions Player.cpp doesn't have, and it didn't save the level.
+- `SaveSystem.h/.cpp` (from the File Handling add-on, fixed): save/load =  player stat save + the map state (`save.txt` and `save.txt.map`), plus the high score (`highscores.txt`). Add-on fixes: missing `#include <string>`, it called functions Player.cpp doesn't have, and it didn't save the level....z
 - Map: walls `#`, NPCs `N`, clues `?`, extra traps on Hard / fewer on Easy, `everythingReachable()` check so walls can't lock the game, `saveMapState/loadMapState`.
 - Game: Continue in the menu, Save (S) in the pause menu, score + high score, level-up message, resizable window that scales to any screen (black bars if the shape differs), Fullscreen/Windowed in the menu and with F11.
 - Boss hit sounds: `SND_SCIENTIST_HIT`, `SND_BAT_HIT`, `SND_HYDRA_HIT` play when that boss gets hurt (right after the sword hit sound). Files: `assets/sounds/scientist_hit.wav`, `bat_hit.wav`, `hydra_hit.wav` (placeholder sounds, replace with real ones).
-- Bug fix in `Player.cpp`: a save slot with item -1 but count > 0 (or an item with count 0) is now rejected on load.
+- Bug fix in `Player.cpp`: a save slot with item -1 but count > 0 (or an item with count 0) is now rejected on load.........///z
 - Every file now starts with a comment saying what it does.
 
 ## Still not done
@@ -35,7 +35,7 @@ Map notes for Amina:
 
 ## Round 3 (changes from the "TO FIX" PDF + PF concepts)
 - **Tile struct** (`Map.h/.cpp`): the map is now `Tile gameMap[10][10]` (type, visited, enemyDefeated, revealed, triggered) instead of 3 separate arrays.
-- **Item struct + bubble sort** (`Player.cpp`): a bag slot is an `Item {id, name, quantity}`; `sortInventory()` bubble-sorts the bag A-Z by name (empty slots last). Press **S** in the bag. Also fixed `saveGameBinary`, which would have written the raw struct (a string pointer) once slots became structs.
+- **Item struct + bubble sort** (`Player.cpp`): a bag slot is an `Item {id, name, quantity}`; `sortInventory()` bubble-sorts the bag A-Z by name (empty slots last). Press **S** in the bag. Also fixed `saveGameBinary`, which would have written the raw struct (a string pointer) once slots became structs....z
 - **Chest/hydra** (`Map.cpp`, `Game.cpp`): the chest is invisible and not interactable until the Bat's decoy key is in the bag. The Hydra no longer stands on the map at 9,6: pressing E on the chest shows the dialogue, then the fight starts (it never starts by walking onto the chest). The chest is at 5,8. Stale clue text fixed ("the first key you are given is a lie", chest in the far east).
 - **Hidden traps and holes**: they look like plain floor until they go off, then their picture stays on the map. A sprung trap does not hurt again. Saved in the map save file (older saves still load).
 - **Music**: `playMusicTrack()` in `BattleSound.cpp`. `assets/music/menu.wav` plays in the menu/credits, `assets/music/explore.wav` while exploring; battle music is unchanged. Drop in `menu.ogg` / `explore.ogg` to replace the placeholders (.ogg is tried first).
