@@ -4,7 +4,7 @@
 sfml version used: 2.6.2
 
 **Member 3 (26L-0852) :**
-I made the whole New_Combat folder. (accidentally forgot to submit the whole folder and so there exists some of its files outside the folder, i didn't delete them just in case the TA would ask for why those files are deleted).
+I made the whole New_Combat folder (no longer exists, as old was deleted). (accidentally forgot to submit the whole folder and so there exists some of its files outside the folder, i didn't delete them just in case the TA would ask for why those files are deleted).
 
 So far, all the combat mechanics have been implemented. All that's really left is to make the game look prettier by adding backgrounds etc and sounds. I have implemented a few just to test things out, so they're more of placeholders while some will stay in the game when finalized.
 
