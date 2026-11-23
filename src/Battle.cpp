@@ -66,7 +66,7 @@ static int logCount = 0;
 static void clearLog() { logCount = 0; }
 static void addLog(const std::string& line)
 {
-    if (logCount < MAX_LOG) logLines[logCount++] = line;
+    if (logCount < MAX_LOG) logLines[logCount++] = line;   //extra lines are just ignored instead of writing past the end of the array
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -77,13 +77,14 @@ static int soundCount = 0;
 
 static void addSound(int id)
 {
-    if (soundCount < MAX_SOUNDS) soundQueue[soundCount++] = id;
+    if (soundCount < MAX_SOUNDS) soundQueue[soundCount++] = id; //if queue full then drop the sound. better than crashing
 }
 
 int queueSound()
 {
     if (soundCount == 0) return SND_NONE;
     int id = soundQueue[0];
+    //take the oldest sound out and shift everything else one spot left (first in first out)
     for (int i = 1; i < soundCount; i++) soundQueue[i - 1] = soundQueue[i];
     soundCount--;
     return id;
@@ -94,18 +95,18 @@ int queueSound()
 
 static int rnd(int n)
 {
-    return rand() % n;
+    return rand() % n;   //0 to n-1
 }
 
 static int rollDamage(int base)          //never below 1. + or -1 to atk
 {
-    int dmg = base + rnd(3) - 1;
+    int dmg = base + rnd(3) - 1;     //rnd(3) is 0, 1 or 2 so minus 1 gives -1, 0 or +1
     return dmg < 1 ? 1 : dmg;
 }
 
 static std::string num(int n)
 {
-    return std::to_string(n);
+    return std::to_string(n); //only here so i dont have to type std::to_string everywhere
 }
 
 static bool playerAlive()
@@ -133,12 +134,13 @@ static int hitPlayer(int dmg)    //returns dmg actually taken.
         dmg = dmg / 2;
         if (dmg < 1) dmg = 1;
     }
-    lastDamageToPlayer += dmg;
-    takeDamage(dmg);
+    lastDamageToPlayer += dmg;       //+= because the hydra can hit more than once in one round
+    takeDamage(dmg);   //the difficulty % is applied inside takeDamage (Player.cpp)
     addSound(playerDefending ? SND_BLOCK : SND_PLAYER_HURT);
     return dmg;
 }
 
+//little bit of text added to the log when defend halves the hit
 static std::string guardNote()
 {
     return playerDefending ? " (guarded)" : "";
@@ -155,9 +157,9 @@ static const std::string SCIENTIST_INTRO[SCIENTIST_INTRO_LINES] = { "Ah, a visit
 bool beginBattle(int bossType, int row, int col)
 {
     if (bossType < 0 || bossType >= ENEMY_TYPE_COUNT) return false;
-    if (isEnemyDefeated(row, col)) return false;
+    if (isEnemyDefeated(row, col)) return false;  //a beaten boss cant be fought twice
 
-    createEnemy(bossType);
+    createEnemy(bossType);    //builds the boss stats from the players current stats
     battleCounterVal++;
     lastDamageToEnemy = lastDamageToPlayer = 0;
     lastHitHead = -1;
@@ -173,7 +175,7 @@ bool beginBattle(int bossType, int row, int col)
     curseTurns = 0;
     curseDamage= 0;
     hydraRound = 0;
-    soundCount = 0;
+    soundCount = 0;        //throw away any sounds left over from before
     clearLog();
 
     if (bossType == ENEMY_MAD_SCIENTIST)
@@ -194,7 +196,7 @@ bool beginBattle(int bossType, int row, int col)
     return true;
 }
 
-
+//only the scientist talks before the fight. the others start right away
 int getIntroLineCount()
 {
     return (isBattleActive() && getEnemyType() == ENEMY_MAD_SCIENTIST) ? SCIENTIST_INTRO_LINES : 0;
@@ -212,6 +214,7 @@ int getIntroIndex()
     return introIndex;
 }
 
+//while this is true playerAction does nothing, so you cant attack during his speech
 bool isInIntro()
 {
     return battleActive && introIndex < getIntroLineCount();
@@ -232,9 +235,10 @@ void cycleTargetHead(int direction)
 {
     if (getEnemyType() != ENEMY_HYDRA) return;
     int h = getTargetHead();
+    //max 3 tries so it cant loop forever and dead heads get skipped
     for (int step = 0; step < HYDRA_HEADS; step++)
     {
-        h = (h + direction + HYDRA_HEADS) % HYDRA_HEADS;
+        h = (h + direction + HYDRA_HEADS) % HYDRA_HEADS;   //+HYDRA_HEADS so going left from head 0 wraps to head 2 instead of -1
         if (isHeadAlive(h)) { targetHead = h; return; }
     }
 }
