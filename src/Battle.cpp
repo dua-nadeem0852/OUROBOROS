@@ -40,18 +40,19 @@ static bool battleActive = false;
 static int battleResult= BATTLE_ONGOING;
 static bool playerDefending = false;
 static bool rewardGiven = false;
-static int battleRow = -1;
+static int battleRow = -1; //the map tile the boss stands on, so endBattle knows which tile to mark as beaten
 static int battleCol = -1;
 static int introIndex = 0;
-static int targetHead = 0;
-static int buffTurns= 0;
+static int targetHead = 0;   //which hydra head we are aiming at (0-2), only matters in the hydra fight
+static int buffTurns= 0; //rounds left on the buff potion
 static int curseTurns = 0;
-static int curseDamage= 0;
+static int curseDamage= 0; //hp lost every turn from the hydra curse
 static int hydraRound = 0;      //rounds completed against the hydra
 static int pendingItem = -1;    //waiting for inventory space
-static int battleCounterVal = 0;
-static int roundCounterVal = 0;
-static int lastDamageToEnemy = 0;
+static int battleCounterVal = 0; //goes up by 1 every new battle. the screen watches it to know when to reset itself
+static int roundCounterVal = 0; //goes up every time a round is really played. the screen uses it to know when to show the damage numbers + shake
+//what happened in the LAST round. only stored so the screen can read it (floating numbers etc)
+static int lastDamageToEnemy = 0; 
 static int lastDamageToPlayer = 0;
 static int lastHitHead = -1;
 
