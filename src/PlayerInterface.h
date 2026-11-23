@@ -1,15 +1,17 @@
 //PlayerInterface.h ------- WHAT THIS FILE DOES: the list of player/bag functions everyone else calls (code is in Player.cpp)
-//it contains a list of all the functions members 1 and 3 will be able to call from here.
+//it contains a list of all the functions members 1 and 3 will be able to call from here...
 //It only DECLARES functions It's really easy to summon units,
 
-#ifndef PLAYER_INTERFACE_H     // "including  guard into it to  prevents double inclusion of this file.....
+#ifndef PLAYER_INTERFACE_H     // "including  guard into it to  prevents double inclusion of this file, it will check whteher its defined or not if its not defined then
+                               // this file will run otherwise if already defined means it exists before then then that 
+                               //defined will be already checked with yes so it will end.....
 #define PLAYER_INTERFACE_H
 #include <string>
 
 
 //  Item identifiers 
 // instead of using the numbers we use their names and it will automatically give it a number
-const int ITEM_HEALING_POTION = 0;
+const int ITEM_HEALING_POTION = 0;   //constant terms are capitalised....
 const int ITEM_POISON_POTION = 1;
 const int ITEM_BUFF_POTION = 2;
 const int ITEM_RELIC = 3;
@@ -28,7 +30,7 @@ const unsigned int PROGRESS_HAS_REAL_KEY = 1;     //bit 0
 const unsigned int PROGRESS_HAS_RELIC    = 2;     //bit 1
 const unsigned int PROGRESS_BEAT_GAME    = 4;     //bit 2, set when the chest is opened
 
-//read player stats
+// functions for reading player stats.....
 int getPlayerHP();
 int getPlayerMaxHP();
 int getplayerAtk();          //dmg a normal atk of the player deals depending on their atk level
