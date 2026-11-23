@@ -31,11 +31,9 @@ static const char* START_MAP[MAP_SIZE] = {
     "...TR....R",
     "B.........."
 };
-
 // extra things from the proposal that sit on top of Amina's layout:
 //   W = wall (cannot walk through)   N = npc (press E to talk)   ? = clue (press E to read)
 // they are put on the map in initializeMap() so START_MAP above stays exactly what Amina made.
-
 
 static const int WALL_COUNT = 8;
 static const int WALL_ROW[WALL_COUNT] = { 1, 1, 3, 3, 6, 7, 7, 8 };
