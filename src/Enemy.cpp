@@ -24,19 +24,21 @@ static int curMaxHP = 0;
 static int curAttack = 0;
 static int curExp = 0;
 
-static int sciPower = 0;
-static int batCount = 0;
+static int sciPower = 0;   //how many power ups the scientist has (0 to 3)
+static int batCount = 0;   //how many extra bats are in the swarm
+//the hydra has one slot per head
 static int headHP[HYDRA_HEADS];
 static int headMaxHP[HYDRA_HEADS];
 static bool headDefending[HYDRA_HEADS];
-static int headAction[HYDRA_HEADS];
+static int headAction[HYDRA_HEADS];       //what each head decided to do this turn
 
 //defeated tracking
-static bool defeated[MAP_ROWS][MAP_COLS] = { { false } };
-static bool bossDefeated[ENEMY_TYPE_COUNT] = { false };
+static bool defeated[MAP_ROWS][MAP_COLS] = { { false } };  //by map tile so the map knows which boss tile is done
+static bool bossDefeated[ENEMY_TYPE_COUNT] = { false };    //by boss type so the story/chest can ask "is the hydra dead?"
 
 void createEnemy(int type)
 {
+ //wipe the old boss completely first so nothing carries over from the last fight
     curType = ENEMY_NONE; curName = ""; curHP = curMaxHP = curAttack = curExp = 0;
     sciPower = 0; batCount = 0;
     for (int i = 0; i < HYDRA_HEADS; i++)
@@ -45,23 +47,25 @@ void createEnemy(int type)
         headDefending[i] = false;
         headAction[i] = HEAD_NONE;
     }
-    if (type < 0 || type >= ENEMY_TYPE_COUNT) return;
+    if (type < 0 || type >= ENEMY_TYPE_COUNT) return;  //bad type, leave the enemy empty
 
     int diff = getDifficulty();
     if (diff < 0 || diff > 2) diff = DIFF_NORMAL;
 
+   //10000 because two percentages get multiplied (weight% x difficulty%)
     int hp  = getPlayerMaxHP() * HP_WEIGHT[type]  * HP_PERCENT[diff]  / 10000;
     int atk = getplayerAtk() * ATK_WEIGHT[type] * ATK_PERCENT[diff] / 10000;
-    if (hp  < 1) hp  = 1;
+    if (hp  < 1) hp  = 1;   //never 0, a boss with 0 hp would be dead before the fight starts
     if (atk < 1) atk = 1;
 
-    curType   = type;
-    curName   = BASE_NAME[type];
+    curType = type;
+    curName = BASE_NAME[type];
     curAttack = atk;
-    curExp    = BASE_EXP[type];     //exp not really scaled by difficulty
+    curExp = BASE_EXP[type];     //exp not really scaled by difficulty
 
     if (type == ENEMY_HYDRA)
     {
+        //every head gets the full hp value, so the total is hp x 3
         for (int i = 0; i < HYDRA_HEADS; i++) headHP[i] = headMaxHP[i] = hp;
         curMaxHP = hp * HYDRA_HEADS;
         curHP = curMaxHP;
@@ -83,6 +87,7 @@ int getEnemyHP()
     if (curType == ENEMY_HYDRA)
     {
         int total = 0;
+      //the hydra has no single hp number, its just the 3 heads added up
         for (int i = 0; i < HYDRA_HEADS; i++) total += headHP[i];
         return total;
     }
@@ -91,18 +96,18 @@ int getEnemyHP()
 
 int enemyTakeDamage(int amount, int head)
 {
-    if (amount < 0) amount = 0;
+    if (amount < 0) amount = 0;   //no negative damage, it would heal the boss
 
     if (curType == ENEMY_HYDRA)
     {
-        head = pickLivingHead(head);
-        if (head < 0) return 0;
+        head = pickLivingHead(head);    //if the aimed head is already dead then a living one takes the hit
+        if (head < 0) return 0;          //all heads are dead
         if (headDefending[head] && amount > 0)
         {
-            amount = amount / 2;
+            amount = amount / 2;          //guarding head takes half (but at least 1. see below)
             if (amount < 1) amount = 1;
         }
-        if (amount > headHP[head]) amount = headHP[head];
+        if (amount > headHP[head]) amount = headHP[head];   //cant deal more than the hp it has left so the number we return is the real one
         headHP[head] -= amount;
         return amount;
     }
@@ -135,8 +140,9 @@ bool summonBat()
 }
 
 //human hydra
-int  getHeadHP(int h) { return (h >= 0 && h < HYDRA_HEADS) ? headHP[h] : 0; }
-int  getHeadMaxHP(int h) { return (h >= 0 && h < HYDRA_HEADS) ? headMaxHP[h] : 0; }
+//the (cond) ? a : b is a shorter if/else. a bad head number gives 0 instead of reading outside the array
+int getHeadHP(int h) { return (h >= 0 && h < HYDRA_HEADS) ? headHP[h] : 0; }
+int getHeadMaxHP(int h) { return (h >= 0 && h < HYDRA_HEADS) ? headMaxHP[h] : 0; }
 bool isHeadAlive(int h) { return getHeadHP(h) > 0; }
 
 int getLivingHeads()
@@ -148,20 +154,20 @@ int getLivingHeads()
 
 int pickLivingHead(int preferred)
 {
-    if (curType != ENEMY_HYDRA) return (curHP > 0) ? 0 : -1;
-    if (preferred >= 0 && preferred < HYDRA_HEADS && headHP[preferred] > 0) return preferred;
-    for (int i = 0; i < HYDRA_HEADS; i++) if (headHP[i] > 0) return i;
+    if (curType != ENEMY_HYDRA) return (curHP > 0) ? 0 : -1;        //the other bosses only have one "head" (0)
+    if (preferred >= 0 && preferred < HYDRA_HEADS && headHP[preferred] > 0) return preferred;       //first choice: the head the player is aiming at
+    for (int i = 0; i < HYDRA_HEADS; i++) if (headHP[i] > 0) return i;    //otherwise the first one that is still alive
     return -1;
 }
 
 int getMostWoundedHead()
 {
     int best = -1;
-    int bestPercent = 101;
+    int bestPercent = 101;     //101 so any real percent (0-100) beats it
     for (int i = 0; i < HYDRA_HEADS; i++)
     {
         if (headHP[i] <= 0 || headHP[i] >= headMaxHP[i]) continue;   //dead or unhurt
-        int percent = headHP[i] * 100 / headMaxHP[i];
+        int percent = headHP[i] * 100 / headMaxHP[i];      //compared by percent not raw hp, so it picks the head that is hurt the most
         if (percent < bestPercent)
         {
             best = i;
@@ -174,7 +180,7 @@ int getMostWoundedHead()
 int healHead(int head, int amount)
 {
     if (head < 0 || head >= HYDRA_HEADS || headHP[head] <= 0 || amount < 0) return 0;
-    int room = headMaxHP[head] - headHP[head];
+    int room = headMaxHP[head] - headHP[head];   //cant heal past max hp
     if (amount > room) amount = room;
     headHP[head] += amount;
     return amount;

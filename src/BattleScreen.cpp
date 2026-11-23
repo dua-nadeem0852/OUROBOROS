@@ -145,7 +145,7 @@ static void spawnNumber(int value, float x, float y, bool onPlayer, float t)
 {
     for (int i = 0; i < MAX_NUMS; i++)
     {
-        if (numActive[i]) continue;
+        if (numActive[i]) continue;   //looking for the first free slot. if all 8 are busy the number is just skipped
         numActive[i] = true;
         numText[i] = std::to_string(value);
         numX[i] = x; numY[i] = y; numStart[i] = t;
@@ -185,12 +185,12 @@ static void drawNumbers(sf::RenderWindow& window, const sf::Font& font, float t)
         float age = t - numStart[i];
         if (age > 1.1f) { numActive[i] = false; continue; }
 
-        sf::Uint8 alpha = (sf::Uint8)(255.f * (1.f - age / 1.1f));
+        sf::Uint8 alpha = (sf::Uint8)(255.f * (1.f - age / 1.1f));  //fades from solid (255) to see through over 1.1 seconds
         sf::Text text(numText[i], font, 34);
         text.setFillColor(numIsPlayer[i] ? sf::Color(255, 110, 110, alpha) : sf::Color(255, 235, 160, alpha));
         text.setOutlineColor(sf::Color(0, 0, 0, alpha));
         text.setOutlineThickness(2.f);
-        text.setPosition(numX[i] - text.getLocalBounds().width / 2.f, numY[i] - 45.f * age);
+        text.setPosition(numX[i] - text.getLocalBounds().width / 2.f, numY[i] - 45.f * age);   //centered on x and floats up 45 pixels per second
         window.draw(text);
     }
 }

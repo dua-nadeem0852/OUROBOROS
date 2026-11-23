@@ -40,18 +40,19 @@ static bool battleActive = false;
 static int battleResult= BATTLE_ONGOING;
 static bool playerDefending = false;
 static bool rewardGiven = false;
-static int battleRow = -1;
+static int battleRow = -1; //the map tile the boss stands on, so endBattle knows which tile to mark as beaten
 static int battleCol = -1;
 static int introIndex = 0;
-static int targetHead = 0;
-static int buffTurns= 0;
+static int targetHead = 0;   //which hydra head we are aiming at (0-2), only matters in the hydra fight
+static int buffTurns= 0; //rounds left on the buff potion
 static int curseTurns = 0;
-static int curseDamage= 0;
+static int curseDamage= 0; //hp lost every turn from the hydra curse
 static int hydraRound = 0;      //rounds completed against the hydra
 static int pendingItem = -1;    //waiting for inventory space
-static int battleCounterVal = 0;
-static int roundCounterVal = 0;
-static int lastDamageToEnemy = 0;
+static int battleCounterVal = 0; //goes up by 1 every new battle. the screen watches it to know when to reset itself
+static int roundCounterVal = 0; //goes up every time a round is really played. the screen uses it to know when to show the damage numbers + shake
+//what happened in the LAST round. only stored so the screen can read it (floating numbers etc)
+static int lastDamageToEnemy = 0; 
 static int lastDamageToPlayer = 0;
 static int lastHitHead = -1;
 
@@ -65,7 +66,7 @@ static int logCount = 0;
 static void clearLog() { logCount = 0; }
 static void addLog(const std::string& line)
 {
-    if (logCount < MAX_LOG) logLines[logCount++] = line;
+    if (logCount < MAX_LOG) logLines[logCount++] = line;   //extra lines are just ignored instead of writing past the end of the array
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -76,13 +77,14 @@ static int soundCount = 0;
 
 static void addSound(int id)
 {
-    if (soundCount < MAX_SOUNDS) soundQueue[soundCount++] = id;
+    if (soundCount < MAX_SOUNDS) soundQueue[soundCount++] = id; //if queue full then drop the sound. better than crashing
 }
 
 int queueSound()
 {
     if (soundCount == 0) return SND_NONE;
     int id = soundQueue[0];
+    //take the oldest sound out and shift everything else one spot left (first in first out)
     for (int i = 1; i < soundCount; i++) soundQueue[i - 1] = soundQueue[i];
     soundCount--;
     return id;
@@ -93,18 +95,18 @@ int queueSound()
 
 static int rnd(int n)
 {
-    return rand() % n;
+    return rand() % n;   //0 to n-1
 }
 
 static int rollDamage(int base)          //never below 1. + or -1 to atk
 {
-    int dmg = base + rnd(3) - 1;
+    int dmg = base + rnd(3) - 1;     //rnd(3) is 0, 1 or 2 so minus 1 gives -1, 0 or +1
     return dmg < 1 ? 1 : dmg;
 }
 
 static std::string num(int n)
 {
-    return std::to_string(n);
+    return std::to_string(n); //only here so i dont have to type std::to_string everywhere
 }
 
 static bool playerAlive()
@@ -132,12 +134,13 @@ static int hitPlayer(int dmg)    //returns dmg actually taken.
         dmg = dmg / 2;
         if (dmg < 1) dmg = 1;
     }
-    lastDamageToPlayer += dmg;
-    takeDamage(dmg);
+    lastDamageToPlayer += dmg;       //+= because the hydra can hit more than once in one round
+    takeDamage(dmg);   //the difficulty % is applied inside takeDamage (Player.cpp)
     addSound(playerDefending ? SND_BLOCK : SND_PLAYER_HURT);
     return dmg;
 }
 
+//little bit of text added to the log when defend halves the hit
 static std::string guardNote()
 {
     return playerDefending ? " (guarded)" : "";
@@ -154,9 +157,9 @@ static const std::string SCIENTIST_INTRO[SCIENTIST_INTRO_LINES] = { "Ah, a visit
 bool beginBattle(int bossType, int row, int col)
 {
     if (bossType < 0 || bossType >= ENEMY_TYPE_COUNT) return false;
-    if (isEnemyDefeated(row, col)) return false;
+    if (isEnemyDefeated(row, col)) return false;  //a beaten boss cant be fought twice
 
-    createEnemy(bossType);
+    createEnemy(bossType);    //builds the boss stats from the players current stats
     battleCounterVal++;
     lastDamageToEnemy = lastDamageToPlayer = 0;
     lastHitHead = -1;
@@ -172,7 +175,7 @@ bool beginBattle(int bossType, int row, int col)
     curseTurns = 0;
     curseDamage= 0;
     hydraRound = 0;
-    soundCount = 0;
+    soundCount = 0;        //throw away any sounds left over from before
     clearLog();
 
     if (bossType == ENEMY_MAD_SCIENTIST)
@@ -193,7 +196,7 @@ bool beginBattle(int bossType, int row, int col)
     return true;
 }
 
-
+//only the scientist talks before the fight. the others start right away
 int getIntroLineCount()
 {
     return (isBattleActive() && getEnemyType() == ENEMY_MAD_SCIENTIST) ? SCIENTIST_INTRO_LINES : 0;
@@ -211,6 +214,7 @@ int getIntroIndex()
     return introIndex;
 }
 
+//while this is true playerAction does nothing, so you cant attack during his speech
 bool isInIntro()
 {
     return battleActive && introIndex < getIntroLineCount();
@@ -231,9 +235,10 @@ void cycleTargetHead(int direction)
 {
     if (getEnemyType() != ENEMY_HYDRA) return;
     int h = getTargetHead();
+    //max 3 tries so it cant loop forever and dead heads get skipped
     for (int step = 0; step < HYDRA_HEADS; step++)
     {
-        h = (h + direction + HYDRA_HEADS) % HYDRA_HEADS;
+        h = (h + direction + HYDRA_HEADS) % HYDRA_HEADS;   //+HYDRA_HEADS so going left from head 0 wraps to head 2 instead of -1
         if (isHeadAlive(h)) { targetHead = h; return; }
     }
 }
@@ -241,16 +246,16 @@ void cycleTargetHead(int direction)
 void playerAtk()
 {
     int head = getTargetHead();
-    bool wasGuarding = (getEnemyType() == ENEMY_HYDRA) && isHeadDefending(head);
+    bool wasGuarding = (getEnemyType() == ENEMY_HYDRA) && isHeadDefending(head);  //checked BEFORE the hit, only for the log text
 
     int dmg = rollDamage(getplayerAtk());
-    if (buffTurns > 0) dmg = dmg * BUFF_PERCENT / 100;
+    if (buffTurns > 0) dmg = dmg * BUFF_PERCENT / 100;    //150/100 = x1.5. multiply first then divide, otherwise integer division would ruin it
 
-    int dealt = enemyTakeDamage(dmg, head);
+    int dealt = enemyTakeDamage(dmg, head);   //dealt can be less than dmg (boss almost dead or head guarding) so the log uses dealt
     lastDamageToEnemy += dealt;
     lastHitHead = (getEnemyType() == ENEMY_HYDRA) ? head : -1;
     addSound(SND_PLAYER_HIT);       //the sword sound...
-    addSound(bossHitSound());       //...and the boss's own "ouch" sound
+    addSound(bossHitSound());    //the boss's own "ouch" sound
 
     if (getEnemyType() == ENEMY_HYDRA)
     {
@@ -268,7 +273,7 @@ void playerAtk()
 
 void defend()
 {
-    playerDefending = true;
+    playerDefending = true;  //turns off again after the enemys turn (see playerAction)
     addLog("You brace yourself. The next hits do half damage.");
 }
 
@@ -290,6 +295,7 @@ bool useBattleItem(int itemId)
         return false;
     }
     int hpBefore = getPlayerHP();      //so poison can report how much it hurt
+    //Player.cpp decides if it works (healing at full hp / buff at max attack say no). if not, no turn is used
     if (!useItem(itemId))
     {
         addLog("It had no effect.");
@@ -298,7 +304,7 @@ bool useBattleItem(int itemId)
 
     if (itemId == ITEM_BUFF_POTION)
     {
-        buffTurns = BUFF_TURNS;
+        buffTurns = BUFF_TURNS;        //useItem already raised the attack level, this is the extra x1.5 for a few rounds
         addSound(SND_BUFF);
         addLog("You drink the " + getItemName(itemId) + ". Power surges through you!");
     }
@@ -333,11 +339,13 @@ bool attemptRun()
 static void scientistTurn()
 {
     int power = getScientistPower();
+    //+30% per power-up he has. power 0,1,2,3 = x1.0, x1.3, x1.6, x1.9
     int atk = getEnemyAttackPower() * (100 + SCI_POWER_PERCENT * power) / 100;
     int roll = rnd(100);
-    bool canHurtSelf = (power < SCI_MAX_POWER) &&
-                       (getEnemyHP() * 100 > getEnemyMaxHP() * SCI_SAFE_HP_PERCENT);
+    //he can only hurt himself if he has power left to gain AND is above 30% hp. (hp*100 > max*30 is "hp above 30%" without decimals)
+    bool canHurtSelf = (power < SCI_MAX_POWER) && (getEnemyHP() * 100 > getEnemyMaxHP() * SCI_SAFE_HP_PERCENT);
 
+    //if the roll is 75+ but he cant hurt himself, it falls through to the normal attack at the bottom
     if (roll >= SCI_SELF_HARM_ROLL && canHurtSelf)
     {
         int loss = getEnemyMaxHP() * SCI_SELF_HARM_PERCENT / 100;
@@ -370,6 +378,7 @@ static void scientistTurn()
 
 static void batTurn()
 {
+    //30% chance he calls another bat instead of attacking. summoning uses up his turn
     if (rnd(100) < BAT_SCREECH_CHANCE && getBatCount() < MAX_BATS)
     {
         summonBat();
@@ -380,6 +389,7 @@ static void batTurn()
 
     int swarmEach = getEnemyAttackPower() * BAT_SWARM_PERCENT / 100;
     if (swarmEach < 1) swarmEach = 1;
+    //every bat that is already here adds some extra damage on top
     int swarm = getBatCount() * swarmEach;
 
     int taken = hitPlayer(rollDamage(getEnemyAttackPower()) + swarm);
@@ -399,14 +409,16 @@ static void chooseHeadActions(int act[HYDRA_HEADS])
         if (!isHeadAlive(i)) continue;
 
         int roll = rnd(100);
-        if (roll < 40)      act[i] = HEAD_ATTACK;
+        //40% attack, 30% heal, 30% defend
+        if (roll < 40) act[i] = HEAD_ATTACK;
         else if (roll < 70) act[i] = HEAD_HEAL;
-        else                act[i] = HEAD_DEFEND;
+        else act[i] = HEAD_DEFEND;
 
         if (act[i] == HEAD_HEAL && !anyWounded)          //nothing to heal
             act[i] = (rnd(2) == 0) ? HEAD_ATTACK : HEAD_DEFEND;
     }
 
+    //the rule: all 3 living heads cant pick the same thing, so one random head (k) switches to something different
     if (getLivingHeads() == HYDRA_HEADS && act[0] == act[1] && act[1] == act[2])
     {
         int k = rnd(HYDRA_HEADS);
@@ -422,6 +434,7 @@ static void chooseHeadActions(int act[HYDRA_HEADS])
     }
 }
 
+//the curse from the wail hurts every hydra turn until the turns run out
 static void tickCurse()
 {
     if (curseTurns <= 0 || !playerAlive()) return;
@@ -437,8 +450,10 @@ static void hydraWail()
     int heads = getLivingHeads();
     addSound(SND_HYDRA_WAIL);
 
+    //coin flip: one big scream or the curse (damage over time)
     if (rnd(2) == 0)
     {
+        //the 300 is 100 (percent) x 3 heads. all heads alive = full wail. every dead head makes it weaker
         int dmg = getEnemyAttackPower() * WAIL_HEAVY_PERCENT * heads / 300;
         int taken = hitPlayer(dmg < 1 ? 1 : dmg);
         addLog("The heads wail together. A crushing scream hits you for " + num(taken) + "!" + guardNote());
@@ -454,7 +469,7 @@ static void hydraWail()
 
 static void hydraTurn()
 {
-    for (int i = 0; i < HYDRA_HEADS; i++) setHeadDefending(i, false);
+    for (int i = 0; i < HYDRA_HEADS; i++) setHeadDefending(i, false); //a guard only lasts one hydra turn so wipe them all first
 
     int act[HYDRA_HEADS];
     chooseHeadActions(act);
@@ -495,15 +510,16 @@ static void hydraTurn()
     tickCurse();
 
     hydraRound++;
-    if (hydraRound % WAIL_EVERY == 0 && playerAlive()) hydraWail();
+    if (hydraRound % WAIL_EVERY == 0 && playerAlive()) hydraWail();   //every 2nd round (2, 4, 6...) the heads wail
 }
 
+//just picks which boss turn to run
 static void enemyTurn()
 {
     int type = getEnemyType();
-    if (type == ENEMY_MAD_SCIENTIST)     scientistTurn();
+    if (type == ENEMY_MAD_SCIENTIST) scientistTurn();
     else if (type == ENEMY_HUMANOID_BAT) batTurn();
-    else if (type == ENEMY_HYDRA)        hydraTurn();
+    else if (type == ENEMY_HYDRA) hydraTurn();
 }
 
 
@@ -512,9 +528,10 @@ static void enemyTurn()
 int checkBattleResult()
 {
     if (!battleActive) return battleResult;
-    if (getPlayerHP() <= 0)       battleResult = BATTLE_LOST;
-    else if (getEnemyHP() <= 0)   battleResult = BATTLE_WON;
-    else                          battleResult = BATTLE_ONGOING;
+    //player is checked first
+    if (getPlayerHP() <= 0) battleResult = BATTLE_LOST;
+    else if (getEnemyHP() <= 0) battleResult = BATTLE_WON;
+    else battleResult = BATTLE_ONGOING;
     return battleResult;
 }
 
@@ -526,7 +543,7 @@ static void giveItemReward(int itemId)
     }
     else
     {
-        pendingItem = itemId;
+        pendingItem = itemId;  //bag full so keep it here and try again later 
         addLog("Your pack is full! Make room to take the " + getItemName(itemId) + ".");
     }
 }
@@ -544,7 +561,7 @@ void battleReward()
     //rewards and exp etc conditions
     if (type == ENEMY_MAD_SCIENTIST)
     {
-        increasePlayerMaxHP(exp / 2);
+        increasePlayerMaxHP(exp / 2);     //half of the exp is given as bonus max hp too
         increaseAttackLevel();
         addLog("Max HP +" + num(exp / 2) + ". Your attack grows stronger!");
     }
@@ -553,8 +570,8 @@ void battleReward()
         increasePlayerMaxHP(exp / 2);
         increaseAttackLevel();
         addLog("Max HP +" + num(exp / 2) + ". Your attack grows stronger!");
-        giveItemReward(ITEM_DECOY_KEY);
-    }
+        giveItemReward(ITEM_DECOY_KEY);          //the decoy key is what makes the chest show up but it cant open it
+        
     else if (type == ENEMY_HYDRA)
     {
         giveItemReward(ITEM_REAL_KEY);       //the proposal: the final boss gives the real key
@@ -564,6 +581,7 @@ void battleReward()
 
 int playerAction(int action, int itemId)
 {
+    //ignore the key if the fight isnt running, is already over, or the scientist is still talking
     if (!battleActive || battleResult != BATTLE_ONGOING || isInIntro()) return battleResult;
 
     clearLog();
@@ -576,7 +594,7 @@ int playerAction(int action, int itemId)
     {
     case ACTION_ATTACK: playerAtk(); break;        //put them in one lines, because you can do that apparently
     case ACTION_DEFEND: defend(); break;
-    case ACTION_ITEM:   turnUsed = useBattleItem(itemId); break;
+    case ACTION_ITEM: turnUsed = useBattleItem(itemId); break;
     case ACTION_RUN:
         if (canRunInThisBattle()) attemptRun();   //decoy option so the turn is wasted
         else turnUsed = false;
@@ -584,14 +602,15 @@ int playerAction(int action, int itemId)
     default: turnUsed = false; break;
     }
 
-    if (!turnUsed) return battleResult;
+    if (!turnUsed) return battleResult;  //bad choice (no potion etc). no round passes so the boss doesnt get a free hit
     roundCounterVal++;
 
+    //the boss only acts if he survived the players move
     if (checkBattleResult() == BATTLE_ONGOING)
     {
         enemyTurn();
-        playerDefending = false;
-        if (buffTurns > 0) buffTurns--;
+        playerDefending = false;   //defend only covers this one enemy turn
+        if (buffTurns > 0) buffTurns--;     //one round of the buff used up
         checkBattleResult();
     }
 
@@ -611,7 +630,7 @@ int endBattle()
     if (result == BATTLE_WON)
     {
         markEnemyDefeated(battleRow, battleCol);   //wont trigger it again 
-        markBossTypeDefeated(getEnemyType());
+        markBossTypeDefeated(getEnemyType());    //the map asks "which tile" and the rest of the game asks "which boss" so both get marked
     }
     battleActive    = false;
     playerDefending = false;
@@ -640,12 +659,14 @@ bool isPlayerDefending() { return playerDefending; }
 int playerBuffTurns() { return buffTurns; }
 int playerCurseTurns() { return curseTurns; }
 int playerCurseDamage() { return curseDamage; }
+//goes 2, 1, 2, 1... the screen uses it for the wail warning
 int hydraTurnsUntilWail() { return WAIL_EVERY - (hydraRound % WAIL_EVERY); }
 int battleLogCount() { return logCount; }
 bool isHydraDefeated() { return isBossTypeDefeated(ENEMY_HYDRA); }
 
 std::string getBattleLogLine(int index)
 {
+    //a bad index gives "" instead of reading outside the array
     return (index >= 0 && index < logCount) ? logLines[index] : "";
 }
 
@@ -659,5 +680,5 @@ void resetBattleSystem()
     pendingItem = -1;
     soundCount = 0;
     clearLog();
-    resetDefeatedEnemies();
+    resetDefeatedEnemies();   //new game, meaning every boss can be fought again
 }
