@@ -19,6 +19,8 @@ const int UI_SOUND_BACK = 2;     // cancelled/not allowed
 //called once per frame, plays the sounds that Battle.cpp announced (hits, laughs, etc)
 void updateBattleSounds();
 void playUiSound(int which);         //played rightaway (menu sound)
+void playEffect(int soundId);        //plays one of the battle sounds (SND_... from Battle.h) rightaway, outside a battle too
+                                     //e.g. the hurt sound when a trap on the map hits the player
 void clearBattleSounds();            //if a new battle, it clears the sounds that were waiting to be played
 
 //battle music. stops on like the normal ending to a fight                   
