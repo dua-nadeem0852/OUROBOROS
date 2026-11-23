@@ -4,19 +4,18 @@ A small story-driven exploration and boss-battle game written in **C++ with SFML
 You play Viktor, lost in a fogged 10x10 ruin: find the relics that piece the story together, survive the
 traps, beat the guardians and work out which key really opens the chest.
 
-Programming Fundamenals project, **Group 8** . (FAST NUCES-2026)
-
-**old/ earlier files from before the merge, kept for reference (not part of the build).**
+Programming Fundamentals project, **Group 8** . (FAST NUCES-2026)
 
 | Part | Who |
 |---|---|
 | Map, exploring, tiles | Amina (26L-0760) |
 | Player, inventory, save data | Zarnib (26L-0769) |
-| Combat, battle screen, sound | Dua (26l-0852) |
+| Combat, battle screen, sound | Dua (26L-0852) |
 
 ## Quick start (Windows)
 
 1. Install **MinGW-w64** (g++ and windres, default folder `C:\mingw64`) and **SFML 2.6.2 for MinGW** (default folder `C:\SFML-2.6.2`).
+   Use the matching builds: GCC 13.1.0, 64-bit, SEH (both are linked from the SFML download page).
    If yours are somewhere else, set the `MINGW` and `SFML` environment variables or edit the top of `scripts\build_game.bat`.
 2. Clone the repo and double-click **`scripts\build_game.bat`** (or run it from the project root in PowerShell: `.\scripts\build_game.bat`).
    It copies the DLLs next to the exe, builds the icon and the game, and starts it.
@@ -26,11 +25,15 @@ Do not move `ouroboros.exe` away from `assets/`.
 
 ## Download ZIP from github
 
+Do step 1 of the quick start first (MinGW-w64 and SFML must be installed).
+
 1. Extract into a new folder.
 2. Go to scripts, then double click `build_game`.
 3. Give the required permissions.
 4. Once this runs, the `ouroboros.exe` will be built (outside the sub-folders).
 5. You can either run it through the `build_game` (will have to give permission every time), but application is preferred, so simply double clicking the `ouroboros.exe` will run the application (no need to give permission every time).
+
+If the submitted ZIP already contains `ouroboros.exe` and the DLLs, just double-click `ouroboros.exe`, no build is needed.
 
 ## Controls
 
@@ -81,12 +84,12 @@ and whether replacing it needs a code change (usually not: keep the file name).
 - [`docs/ASSET_GUIDE.md`](docs/ASSET_GUIDE.md) - every image, sound and music file
 - [`docs/CHANGELOG.md`](docs/CHANGELOG.md) - what changed between versions
 - [`docs/OLD_README.md`](docs/OLD_README.md) - older implementation logs
+
 ## Credits
 
-- Pictures, sprites, backgrounds, menu video, music and most sound effects: AI-generated with ChatGPT.
-- Attack / sword slash swoosh sound: Mixkit.
+- Pictures, sprites, backgrounds, menu video, music and most sound effects: AI-generated with ChatGPT and Claude.
+- Attack / sword slash sound: Mixkit.
 - Hydra wail (monster scream) and pain grunt sounds: UpperBeat.
-- Scientist battle theme (`assets/music/battle_0.ogg`): composed with Claude (Anthropic).
 - Font: Crimson Text by The Crimson Text Project Authors, SIL Open Font License (`assets/fonts/OFL.txt`).
 
-The same list is on the in-game credits screen (`src/Story.cpp`) and in `docs/ASSET_GUIDE.md` 
+The same list is on the in-game credits screen (`src/Story.cpp`) and in `docs/ASSET_GUIDE.md`.
