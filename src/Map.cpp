@@ -1,11 +1,11 @@
-// Map.cpp - the map, the player's position and what is on every tile (Amina's part)
-// WHAT THIS FILE DOES: holds the 10x10 map, moves the player (walls block you), decides what
+// Map.cpp - It contains the map, the player's position and whatever is on every tile (Amina's part)
+// WHAT THIS FILE DOES: It is a 10x10 map, moves the player (walls block you), decides what
 // happens on every tile (traps, holes, bushes, relics, keys, npcs, clues, bosses, the chest),
 // makes the map a bit harder/easier depending on the difficulty, saves/loads the map state
-// and draws the map. it does NOT know about battles (Battle.cpp) or the bag (Player.cpp),
-// it only asks them questions.
+// and draws the map. 
 // the layout is the same one Amina made, only the extra E tiles were taken out
 // (there are only 3 bosses so only 3 enemy tiles are needed, see the map below)
+
 #include "Map.h"
 #include "UiDraw.h"
 #include "Enemy.h"
@@ -35,7 +35,8 @@ static const char* START_MAP[MAP_SIZE] = {
 // extra things from the proposal that sit on top of Amina's layout:
 //   W = wall (cannot walk through)   N = npc (press E to talk)   ? = clue (press E to read)
 // they are put on the map in initializeMap() so START_MAP above stays exactly what Amina made.
-// every one of them is on a plain empty tile, so nothing gets cut off
+
+
 static const int WALL_COUNT = 8;
 static const int WALL_ROW[WALL_COUNT] = { 1, 1, 3, 3, 6, 7, 7, 8 };
 static const int WALL_COL[WALL_COUNT] = { 2, 3, 8, 9, 8, 7, 8, 6 };
