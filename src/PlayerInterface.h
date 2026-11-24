@@ -26,6 +26,8 @@ const int DIFF_HARD = 2;
 
 //progress switches (each one is a single bit, so they can be mixed in one number with | )
 //Player.cpp turns the first two on by itself when the item is picked up
+
+//bit operations are safer iwthout sign
 const unsigned int PROGRESS_HAS_REAL_KEY = 1;     //bit 0 (001) is set one(. it will be turned on when he got real key)
 const unsigned int PROGRESS_HAS_RELIC    = 2;     //bit 1 (010) when the relic is picked up
 const unsigned int PROGRESS_BEAT_GAME    = 4;     //bit 2, itll be on when the chest is opened
@@ -80,13 +82,13 @@ const char* getPlayerName();
 
 // flagss
 
-void setProgressFlag(unsigned int flag);
-void clearProgressFlag(unsigned int flag);
-bool hasProgressFlag(unsigned int flag);
+void setProgressFlag(unsigned int flag);     //  to turn a awitch on...
+void clearProgressFlag(unsigned int flag);  // if used then set back to 0 or off
+bool hasProgressFlag(unsigned int flag);  // checking if the specific switch is on
 
 
 
-int  countProgressFlags();
+int  countProgressFlags();          // counting how many switches are currently on or how many things it have rn
 
 //Looks up items based on a text (C-string compare). Returns -1 if there is no return.
 int findItemIdByName(const char* name);
@@ -94,12 +96,12 @@ int findItemIdByName(const char* name);
 // starting the game from start ....
 void resetPlayerToDefault();
 
-// Saving / loading 
-
-bool saveGameBackup(const std::string& filename ="save_backup.txt");
-bool loadGameBackup(const std::string& filename ="save_backup.txt");
-bool saveGameBinary(const std::string& filename ="save_backup.bin");
+// Saving / loading                                                      //we writing string herre cuz we are expecting a text sentence here...
+                                                                       //when player hits save or he moves to next level his stats are save
+bool saveGameBackup(const std::string& filename ="save_backup.txt");   // it writes readable text backup for game state and returns true if its saving was completed
+bool loadGameBackup(const std::string& filename ="save_backup.txt");  //reads back the txt file so that layer can continue...
+bool saveGameBinary(const std::string& filename ="save_backup.bin");  //writing in binary as it is smaller, faster, difficult to edit by someone else in notepad
 bool loadGameBinary(const std::string& filename ="save_backup.bin");
-const char* getLastFileError();
+const char* getLastFileError();       // instead of just showing that the file has failed to load we shwo the error message why its failed
 
 #endif
