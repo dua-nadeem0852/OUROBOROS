@@ -156,7 +156,7 @@ bool movePlayer(int rowChange, int colChange)
         return false;
     }
 
-    // bug fix: there was nothing that could block the player before. walls do now
+    // initially there was nothing that could block the player before. walls do now
     if (gameMap[newRow][newCol].type == 'W')
     {
         message = "A wall blocks the way.";
