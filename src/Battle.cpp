@@ -570,7 +570,8 @@ void battleReward()
         increasePlayerMaxHP(exp / 2);
         increaseAttackLevel();
         addLog("Max HP +" + num(exp / 2) + ". Your attack grows stronger!");
-        giveItemReward(ITEM_DECOY_KEY);          //the decoy key is what makes the chest show up but it cant open it
+        giveItemReward(ITEM_DECOY_KEY); 
+    }         //the decoy key is what makes the chest show up but it cant open it
         
     else if (type == ENEMY_HYDRA)
     {
