@@ -1,4 +1,4 @@
-// - WHAT THIS FILE DOES: the player's hp, level, exp, bag/items, difficulty and the save/load of those (Zarnib's part)
+// - WHAT THIS FILE DOES: the player's hp, level, exp, bag/items, difficulty and the save/load of those (Zarnib's part)....
 #include "PlayerInterface.h"
 #include <fstream>      // for reading and writing files.....
 #include <cstring>    
@@ -12,16 +12,19 @@ const int MAX_STACK = 99;   // we cannot carry more than 99 of one item
 const int NAME_LENGTH = 20; // the player's name can have at most 19 letters
 
 
-// 2D array for levels where rows represent levels and columns represent the % attack it cwill have and enemy strength accoriding to level
-static const int difficultyTable[3][2] = {
+// 2D array for levels where rows represent levels and columns represent the % of damage the player will take 
+//and  column 1 is enemy strength accoriding to level
+static const int difficultyTable[3][2] = {   //using static to prevent clashes with other files as it will be just private to this
     { 75, 80 },     //  easy
     { 100, 100 },   //  normal
     { 150, 130 }    //  hard
 };
 
-// 2D array of letters:
+// 2D array of letters with 6 rows for each word and max character we could have is 16 including null terminator
+//its rows are in accordance with the ids they wrere given above
+//so  --- ROWS = IDs ---
 
-static const char itemNames[6][16] = {
+static const char itemNames[6][16] = {    
     "Healing Potion", "Poison Potion", "Buff Potion", "Relic Bag", "Key", "Key"
 };
 
@@ -29,7 +32,7 @@ static const char itemNames[6][16] = {
 static const char itemDescriptions[6][60] = {
     "Restores 40 HP.",
     "Looks like medicine... it is not. Costs 15 HP.",
-    "Raises your attack level by one.",
+    "Raises your attack level by one.",                       //you can now attack with more strength
     "All the relics you found, kept together in one bag.",
     "An old key. Does it fit a lock?",
     "An old key. Does it fit a lock?"
@@ -49,7 +52,7 @@ static int difficulty = DIFF_NORMAL;
 static unsigned int progressFlags = 0;      // many yes/no switches stored in one number
 static char playerName[NAME_LENGTH] = "Viktor";   
 
-// one bag slot is now a structure (PF notes: struct) instead of a row of a 2D array.
+// one bag slot is now a structure (PF notes: struct) instead of a row of a 2D array cuz an array can only store data of same dtatatypes 
 // it keeps the id, the name and the quantity together, so sorting can swap the whole Item at once
 // an empty slot has id -1, an empty name and quantity 0
 struct Item {
@@ -58,14 +61,16 @@ struct Item {
     int quantity;
 };
 
+//here item has become kinda data type 
+
 // inventory has 8 slots. -1 / "" / 0 means that the slot is emptyy...
 static Item slot[INVENTORY_SLOTS] = {
     {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}
 };
 
-static char lastError[100] = "";    // remembers the last file problem
+static char lastError[100] = "";    // remembers the last file problem , if empty then no error
 
-// Small helper functions only for this file use
+// Small .. FUNCIONS... only for this file use
 
 
 //  to find an item to use first check whether its present or not and then Looks through all slots and returns the slot number that holds this item.
@@ -102,22 +107,24 @@ static int totalItemsInBag(const Item bag[], int rows) {
     return totali;
 }
 
-// used recursion asking the function itself about next level exp, as for moving towards next level we need to multiply each exp by 100
+// used recursion asking the function itself about next level exp until it reaches base case, as for moving towards next level we need to multiply each exp by 100
 
 static int expNeeded(int levl) {
     if (levl <= 1) {
-        return 100;    //it will return 100 for easy level
+        return 100;    //it will return 100 for easy level which is our first level
     }
     return expNeeded(levl - 1) + 100;
 }
 
 
 // Readi player data noww
+//getter function like they just rerurn the value as it is 
 
 int getPlayerHP()
  { return hp; }
 int getPlayerMaxHP() { return maxHp; }
 int getplayerAtk() { return 10 + (atkLevel - 1) * 5; }   //as attack strength and power will depend on level
+                                                        // so  level1=10 ,level2=15.....
 int getplayerAtkLevel() { return atkLevel; }
 int getPlayerMaxAttackLevel() { return maxAtkLevel; }
 int getDifficulty() { return difficulty; }
@@ -125,7 +132,7 @@ int getPlayerExp() { return expPoints; }
 int getPlayerLevel() { return level; }
 int getExpNeededForNextLevel() { return expNeeded(level); }
 bool isPlayerDead() { return hp <= 0; }    //if helath becomes 0.........
-int getEnemyStrengthPercent() { return difficultyTable[difficulty][1]; }   //user will enter the difficulty level and accordin to above mentioned grid enemy strength will be found and given to it from 1st column
+int getEnemyStrengthPercent() { return difficultyTable[difficulty][1]; }   // the difficulty level and accordin to above mentioned grid enemy strength will be found and given to it from 1st column
 int getTotalItems() { return totalItemsInBag(slot, INVENTORY_SLOTS); }
 
 
@@ -135,7 +142,7 @@ int getTotalItems() { return totalItemsInBag(slot, INVENTORY_SLOTS); }
 void takeDamage(int amount) {
     if (amount <= 0) {
         return;
-    }
+    }                                            //like for hard level we have 10 * 150 / 100 = 15  ....
     int relDamage = amount * difficultyTable[difficulty][0] / 100;  //damage the player gets according to its level and enemy strength
     if (relDamage < 1) {
         relDamage = 1;                 // a hit always hurts at least 1
@@ -146,20 +153,21 @@ void takeDamage(int amount) {
     }
 }
 
-//  two functions with the same name but different inputs to preven overloding
+//  two functions with the same name but different inputs = overloding
 
 void healPlayer(int amount) {
     if (amount <= 0) {
         return;
     }
     hp = hp + amount;
-    if (hp > maxHp) {
+    if (hp > maxHp) {       //like when you drink any potion kinda thing
         hp = maxHp;                     // hp cant go above the maximum
     }
 }
 
 void healPlayer() {  
-    hp = maxHp;                         // we use two functions to preevent overload as if there is no amount enter then player heals fully like when you move or start a new game
+    hp = maxHp;                         // we use two functions to preevent overload as if there is no amount enter
+                                 //               then player heals fully like when you move or start a new game
 }
 
 void addExperience(int amount) {
@@ -172,7 +180,7 @@ void addExperience(int amount) {
     while (expPoints >= expNeeded(level)) {
         expPoints = expPoints - expNeeded(level);   // the extra exp is kept and the level will be automatically incremented
         level++;
-        maxHp = maxHp + 20;                          //als max hp will increase 
+        maxHp = maxHp + 20;                          //also max hp will increase 
         hp = maxHp;                                 // level up heals the player fully
     }
 }
