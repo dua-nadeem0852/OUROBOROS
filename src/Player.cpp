@@ -432,13 +432,13 @@ void resetPlayerToDefault() {
     progressFlags = 0;
     strcpy(playerName, "Viktor");
 
-    for (int i = 0; i < INVENTORY_SLOTS; i++) {     // empty every slot
+    for (int i = 0; i < INVENTORY_SLOTS; i++) {     // emptying every slot.............
         slot[i].id = -1;
         slot[i].name = "";
         slot[i].quantity = 0;
     }
 
-    addItem(ITEM_HEALING_POTION, 2);    // two healing potions. Viktor starts with NO relics, he has to find all of them
+    addItem(ITEM_HEALING_POTION, 2);    // two healing potions given to Viktor  and he starts with NO relics, he has to find all of them
 }
 
 
@@ -449,7 +449,7 @@ void resetPlayerToDefault() {
 static void checkLoadedData(int h, int mh, int lv, int atk, int ex, int diff, const int bag[][2]) {
     if (mh < 1 || h < 0 || h > mh) {
         throw "The save file might have wrong hp values";
-    }
+    }                                                      //this will be catched by last file error and it will be given to the menu or ui
     if (lv < 1 || ex < 0) {
         throw "The save file might havewrong level or exp values";
     }
@@ -466,7 +466,7 @@ static void checkLoadedData(int h, int mh, int lv, int atk, int ex, int diff, co
         if (bag[i][COUNT] < 0 || bag[i][COUNT] > MAX_STACK) {
             throw "The save file might have wrong item count";
         }
-        // bug fix: before this a slot could say "no item" (-1) but still hold a count, or hold
+        //  before this a slot could say "no item" (-1) but still hold a count, or hold
         // an item with a count of 0. both make the bag show/behave wrong, so we reject them
         if ((bag[i][ID] == -1 && bag[i][COUNT] != 0) || (bag[i][ID] >= 0 && bag[i][COUNT] == 0)) {
             throw "The save file has a bag slot that does not make sense";
@@ -497,7 +497,7 @@ static void useLoadedData(int h, int mh, int lv, int atk, int ex, int diff,
 // saving themm
 bool saveGameBackup(const string& filename) {
     try {
-        ofstream out(filename.c_str());
+        ofstream out(filename.c_str());          //writing  in the  file
         if (!out.is_open()) {
             throw "Could not open the file for saving";
         }
@@ -507,9 +507,9 @@ bool saveGameBackup(const string& filename) {
         for (int i = 0; i < INVENTORY_SLOTS; i++) {
             out << slot[i].id << " " << slot[i].quantity << "\n";
         }
-        out.close();
-
-        lastError[0] = '\0';            // no problem
+        out.close();                  //closing the file for optimisation and to clear the storage......
+                                      // for this even if the file doesn exist , it will create one and write according to it
+        lastError[0] = '\0';            // no problem  , empty string
         return true;
     }
     catch (const char* message) {
@@ -521,7 +521,7 @@ bool saveGameBackup(const string& filename) {
 // ----- Load from the text file -----
 bool loadGameBackup(const string& filename) {
     try {
-        ifstream in(filename.c_str());
+        ifstream in(filename.c_str());    //read whatever written in this file and for this the file needs to exists before
         if (!in.is_open()) {
             throw "Save file not found";
         }
