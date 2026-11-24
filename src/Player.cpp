@@ -497,7 +497,7 @@ static void useLoadedData(int h, int mh, int lv, int atk, int ex, int diff,
 // saving themm
 bool saveGameBackup(const string& filename) {
     try {
-        ofstream out(filename.c_str());          //writing  in the  file
+        ofstream out(filename.c_str());          //writing  in the  file, it verwrites any existing filess..........
         if (!out.is_open()) {
             throw "Could not open the file for saving";
         }
