@@ -370,7 +370,7 @@ static void drawLetterTile(sf::RenderWindow& window, const sf::Font& font, float
                            const char* letter, sf::Color fill)
 {
     sf::RectangleShape box(sf::Vector2f(TILE_SIZE - 6.f, TILE_SIZE - 6.f));
-    box.setPosition(x + 3.f, y + 3.f);
+    box.setPosition(x + 3.f, y + 3.f);   //centering 
     box.setFillColor(fill);
     window.draw(box);
     drawCenteredText(window, font, letter, 28, x + TILE_SIZE / 2.f, y + 14.f, sf::Color(240, 235, 220));
