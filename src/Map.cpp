@@ -18,7 +18,7 @@ const int START_COL = 4;
 const int TRAP_DAMAGE = 10;    //takeDamage() makes it bigger on hard
 const int HOLE_DAMAGE = 15;
 
-// the map. each string is one row
+// the map each string is one row
 static const char* START_MAP[MAP_SIZE] = {
     ".T.B..B...",
     "......T.E.",
@@ -35,14 +35,14 @@ static const char* START_MAP[MAP_SIZE] = {
 //   W = wall (cannot walk through)   N = npc (press E to talk)   ? = clue (press E to read)
 // they are put on the map in initializeMap() so START_MAP above stays exactly what Amina made.
 
-static const int WALL_COUNT = 8;
-static const int WALL_ROW[WALL_COUNT] = { 1, 1, 3, 3, 6, 7, 7, 8 };
+static const int WALL_COUNT = 8;  // a total of 8 walls
+static const int WALL_ROW[WALL_COUNT] = { 1, 1, 3, 3, 6, 7, 7, 8 };   // specifying the coordinates for where the wall will be
 static const int WALL_COL[WALL_COUNT] = { 2, 3, 8, 9, 8, 7, 8, 6 };
 
 static const int NPC_COUNT = 2;
 static const int NPC_ROW[NPC_COUNT] = { 4, 6 };
 static const int NPC_COL[NPC_COUNT] = { 2, 1 };
-static const char* NPC_TEXT[NPC_COUNT] = {
+static const char* NPC_TEXT[NPC_COUNT] = {   // const char* has been used as we are storing text not a number
     "A lost traveller whispers: \"Not every key is what it looks like. Ask the thing at the very end.\"",
     "A hooded figure says: \"Three guard this place. The last one carries the only key that matters.\""
 };
@@ -74,8 +74,8 @@ static const int RELIC_TILE_ROW[RELIC_TILE_COUNT]   = { 2, 2, 3, 3, 5, 8, 8 };
 static const int RELIC_TILE_COL[RELIC_TILE_COUNT]   = { 4, 7, 1, 6, 7, 4, 9 };
 static const int RELIC_TILE_STORY[RELIC_TILE_COUNT] = { 0, 3, 1, 4, 2, 5, 6 };
 
-// the three bosses and where they stand
-// (row, col, which boss). scientist is the closest one to the start, hydra the furthest
+// the three bosses and their positioning
+// (row, col, which boss). scientist is the closest one to the start, hydra is the last (appears once you have defeated the previous 2 bosses)
 static const int BOSS_COUNT = 3;
 // the hydra's "position" is the chest, because that is where you fight it
 static const int BOSS_ROW[BOSS_COUNT]  = { 2, 1, CHEST_ROW };
@@ -95,14 +95,14 @@ static Tile gameMap[MAP_SIZE][MAP_SIZE];
 static int  playerRow = START_ROW;
 static int  playerCol = START_COL;
 static int  relicsFound = 0;
-static int  lastRelicStory = -1;     // which story the last relic picked up has
+static int  lastRelicStory = -1;     // which story the last relic picked up has, -1 is used to show no signal
 static std::string message = "";
 
 void initializeMap()
 {
-    for (int r = 0; r < MAP_SIZE; r++)
+    for (int r = 0; r < MAP_SIZE; r++) //rows
     {
-        for (int c = 0; c < MAP_SIZE; c++)
+        for (int c = 0; c < MAP_SIZE; c++) // cols
         {
             gameMap[r][c].type = START_MAP[r][c];
             gameMap[r][c].revealed = false;
