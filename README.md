@@ -11,7 +11,8 @@ Programming Fundamentals project, **Group 8** . (FAST NUCES-2026)
 | Map, exploring, tiles | Amina (26L-0760) |
 | Player, inventory, save data | Zarnib (26L-0769) |
 | Combat, battle screen, sound | Dua (26L-0852) |
- 
+
+**Must be SFML 2.6.2 (not 3.x), MinGW GCC 13.1.0 64-bit SEH.**
 ## Quick start (Windows)
  
 1. Install **MinGW-w64** (g++ and windres, default folder `C:\mingw64`) and **SFML 2.6.2 for MinGW** (default folder `C:\SFML-2.6.2`).
