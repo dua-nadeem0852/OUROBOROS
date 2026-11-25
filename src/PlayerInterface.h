@@ -54,7 +54,7 @@ int getSlotItemCount(int slot);   //counts copies of anitem that are stacked in 
 bool hasItem(int itemId);
 int getItemCount(int itemId);
 bool useItem(int itemId);        // removes one and applies it: healing restores HP, poison costs HP, a buff raises the attack level by one for good
-                                 // (Battle.cpp adds the extra x1.5 for a few rounds on top). false if it is not in the bag or would do nothing
+                                 // (Battle.cpp adds the extra x1.5 for a few rounds on top). false if it is not in the bag, or healing at full HP. the buff is always used: at max attack level only the permanent +1 is skipped
 bool addItem(int itemId);        //returns false if inventory is full
 void sortInventory();            //bubble sort: puts the bag in A-Z order by item name (empty slots go last)
 std::string getItemName(int itemId);    // both keys return "Key"
@@ -84,5 +84,4 @@ void resetPlayerToDefault();
 bool saveGameBackup(const std::string& filename ="save_backup.txt");   // it writes readable text backup for game state and returns true if its saving was completed
 bool loadGameBackup(const std::string& filename ="save_backup.txt");  //reads back the txt file so that layer can continue...
 const char* getLastFileError();       // instead of just showing that the file has failed to load we shwo the error message why its failed
-
 #endif
