@@ -20,7 +20,8 @@ bool saveGame(const std::string& filename)
 bool loadGame(const std::string& filename)
 {
     //load the map first. it checks its file before changing anything.
-    //if the player file is broken afterwards the player is unchanged (Player.cpp checks first too)
+    //NOTE: if the map loads but the player file is then broken, the map stays changed and the player does not
+    //(only possible with a corrupted or hand-edited save; Player.cpp checks its file before changing anything)
     if (!loadMapState(filename + ".map")) return false;
     if (!loadGameBackup(filename)) return false;
     return true;
