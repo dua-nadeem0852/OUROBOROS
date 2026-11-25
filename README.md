@@ -12,7 +12,10 @@ Programming Fundamentals project, **Group 8** . (FAST NUCES-2026)
 | Player, inventory, save data | Zarnib (26L-0769) |
 | Combat, battle screen, sound | Dua (26L-0852) |
 
+## Requirements and Notes
 **Must be SFML 2.6.2 (not 3.x), MinGW GCC 13.1.0 64-bit SEH.**
+The game was developed and tested on Windows using SFML 2.6.2. The core game mechanics are cross-platform but we haven't tested the project on macOS. It would require configuring the appropriate SFML libraries and build environment for Mac.
+
 ## Quick start (Windows)
  
 1. Install **MinGW-w64** (g++ and windres, default folder `C:\mingw64`) and **SFML 2.6.2 for MinGW** (default folder `C:\SFML-2.6.2`).
