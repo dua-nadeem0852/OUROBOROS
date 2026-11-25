@@ -9,16 +9,17 @@
 #include <string>
 #include <vector>
 
-const int SCREEN_W = 1280;
+const int SCREEN_W = 1280;  // a size that fits on almost on every computer screen
 const int SCREEN_H = 720;
 
 //main menu. difficulty is DIFF_EASY / DIFF_NORMAL / DIFF_HARD (from PlayerInterface.h)
+// hard unlocked is bool cuz it will be openend when you ace normal level
 void drawMainMenu(sf::RenderWindow& window, const sf::Font& font, int selected, int difficulty, bool hardUnlocked, bool canContinue, bool fullscreen, int highScore);
 
 //the panel on the right side of the map (hp, exp, keys, relics, message)
 void drawHud(sf::RenderWindow& window, const sf::Font& font, const std::string& message);
 
-//the bag (I key) selected = which of the 8 slots is highlighted
+//the bag (I key) selected = which of the 8 slots is highlighted (inventory)
 void drawInventory(sf::RenderWindow& window, const sf::Font& font, int selected, const std::string& notice);
 
 //a story/dialogue box over a dark background. used for relics, the intro, the ending
