@@ -7,8 +7,8 @@
 
 //save/load are only meant to be used while exploring, never in the middle of a battle.
 //player stuff goes to <filename>, map stuff goes to <filename>.map
-bool saveGame(const std::string& filename = "save.txt");
-bool loadGame(const std::string& filename = "save.txt");
+bool saveGame(const std::string& filename = "save.txt");  //to modify orginally text file instead of making a copy for it
+bool loadGame(const std::string& filename = "save.txt");     //save.txt default name
 bool saveExists(const std::string& filename = "save.txt");   //used to grey out "Continue"
 
 //keeps the best score ever in a text file
