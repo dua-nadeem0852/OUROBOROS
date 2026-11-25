@@ -10,7 +10,7 @@
 
 //buff potion (used in battle)
 static const int BUFF_PERCENT = 150;      //plus 50% extra dmg
-static const int BUFF_TURNS = 3;        //rounds the buff lasts. the round you drink it counts too (the boss answers and uses one up), so it covers your next 2 attacks
+static const int BUFF_TURNS = 3;        //how many of your ATTACKS get the buff. drinking the potion itself does not use one up, and defending / other items don't either
 
 //BOSS MECHANICS outside of the common atks (basically special mechanics)
 //mad scientist: i wanted to show him a little erratic so each turn rolls 0-99
@@ -253,7 +253,11 @@ void playerAtk()
     bool wasGuarding = (getEnemyType() == ENEMY_HYDRA) && isHeadDefending(head);  //checked BEFORE the hit, only for the log text
 
     int dmg = rollDamage(getplayerAtk());
-    if (buffTurns > 0) dmg = dmg * BUFF_PERCENT / 100;    //150/100 = x1.5. multiply first then divide, otherwise integer division would ruin it
+    if (buffTurns > 0)
+    {
+        dmg = dmg * BUFF_PERCENT / 100;    //150/100 = x1.5. multiply first then divide, otherwise integer division would ruin it
+        buffTurns--;                       //one buffed attack used up (only attacks count, not the round you drink it)
+    }
 
     int dealt = enemyTakeDamage(dmg, head);   //dealt can be less than dmg (boss almost dead or head guarding) so the log uses dealt
     lastDamageToEnemy += dealt;
@@ -309,7 +313,7 @@ bool useBattleItem(int itemId)
 
     if (itemId == ITEM_BUFF_POTION)
     {
-        buffTurns = BUFF_TURNS;        //useItem already raised the attack level (if it was not at max yet), this is the extra x1.5 for a few rounds
+        buffTurns = BUFF_TURNS;        //useItem already raised the attack level (if it was not at max yet), this is the extra x1.5 for your next 3 attacks
         addSound(SND_BUFF);
         addLog("You drink the " + getItemName(itemId) + ". Power surges through you!");
     }
@@ -590,7 +594,6 @@ static void bossAnswers()
 {
     enemyTurn();
     playerDefending = false;   //defend only covers this one enemy turn
-    if (buffTurns > 0) buffTurns--;     //one round of the buff used up
     checkBattleResult();
 }
 
