@@ -4,6 +4,7 @@ Older entries describe the game as it was at that time (flat folder layout, key 
  
 ## Buff potion fix
  
+- **Bug fix: drinking the buff potion used up one of its rounds.** The buff counter went down every time the boss answered, including the round you drank the potion, so only 2 attacks were buffed. It now counts only your attacks, so all 3 buffed attacks happen; drinking, defending or using other items don't use one up.
 - **Bug fix: the buff potion did nothing at attack level 3.** `useItem()` in `Player.cpp` refused the potion when the attack level was already max, so the battle never applied the x1.5 damage for 3 rounds. The potion is now always used in a fight: at max level only the permanent +1 is skipped (`increaseAttackLevel()` already caps at 3).
 ## Final cleanup round
  
@@ -74,3 +75,4 @@ Map notes for Amina:
 - Docs: `ASSET_GUIDE.md` (potion sounds, how to pick the font), `README.md` (potions, font note), `assets/fonts/README.md` (font tips).
 - Font added: `assets/fonts/game.ttf` = Crimson Text Regular (+ `OFL.txt` licence). All characters used in the game text are in the font. Credited in `src/Story.cpp`, the README and the asset guide.
 - Credits filled in (`src/Story.cpp`, README, asset guide): AI-generated assets (ChatGPT and Claude), Mixkit and UpperBeat sound effects, Crimson Text font.
+ 
