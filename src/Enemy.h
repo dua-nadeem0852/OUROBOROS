@@ -1,14 +1,14 @@
-////DUA NADEEM 26L-0852 member 3
+//DUA NADEEM 26L-0852 member 3
 //Enemy.h - WHAT THIS FILE DOES: boss types (ENEMY_) and the functions to read a boss's hp/name/state. code is in Enemy.cpp
 #ifndef ENEMY_H
 #define ENEMY_H
 #include <string>
 
-//confirm from amina
+//map size (the same as MAP_SIZE in Map.h). Enemy.cpp keeps one 'defeated' flag per tile
 const int MAP_ROWS = 10;
 const int MAP_COLS = 10;
 
-//enemy type identifiers for amina's map. to be stored as per tile.
+//boss type ids (Map.cpp says which boss stands on which tile)
 const int ENEMY_NONE          = -1;
 const int ENEMY_MAD_SCIENTIST = 0;
 const int ENEMY_HUMANOID_BAT  = 1;
@@ -58,8 +58,6 @@ int getMostWoundedHead();                //living head with lowest hp% or -1 if 
 int healHead(int head, int amount);      //to return hp restored
 void setHeadDefending(int head, bool on);
 bool isHeadDefending(int head);
-void setHeadAction(int head, int action);   //only so the screen can show it
-int getHeadAction(int head);
 
 //dead/defeated boss tracking so they never retrigger
 bool isEnemyDefeated(int row, int col);

@@ -18,8 +18,8 @@ Every file also starts with a comment saying what it does.
 | File | What it does |
 |---|---|
 | `Map.h/.cpp` | the 10x10 map as a `Tile` array, walking, walls, hidden traps and holes, bushes, relics, NPCs, clues, the chest, saving/loading the map, drawing the tiles |
-| `PlayerInterface.h` | the list of player/bag functions everyone calls (and item / difficulty constants) z...|
-| `Player.cpp` | hp, level, exp, difficulty, the bag (`Item` struct, bubble sort), and saving/loading those z... |
+| `PlayerInterface.h` | the list of player/bag functions everyone calls (and item / difficulty constants) |
+| `Player.cpp` | hp, level, exp, difficulty, the bag (`Item` struct, bubble sort), and saving/loading those |
 | `SaveSystem.h/.cpp` | `saveGame` / `loadGame` (player + map) and the high score file |
 
 ## Combat (Dua)
@@ -41,11 +41,13 @@ Every file also starts with a comment saying what it does.
 ## Who calls whom
 
 ```
-main -> Game -> Map, Screens, Story, BattleScreen, BattleSound, SaveSystem
+main -> Game -> Map, Screens, Story, Battle, BattleScreen, BattleSound, SaveSystem
 Map, Battle, BattleScreen, Screens, SaveSystem -> PlayerInterface (Player.cpp)
-BattleScreen -> Battle, Enemy, UiDraw
+Map, Battle, BattleScreen -> Enemy
+Screens -> Map, Story
+BattleScreen -> Battle, UiDraw
 ```
-The map never fights and the battle never knows about the map: `Game.cpp` is the only file that connects them.
+The map never fights and the battle never knows about the map: `Game.cpp` is the only file that starts a fight from the map. (`Map.cpp` only asks `Enemy.cpp` which bosses are beaten.)
 
 ## Run-time files (not in git)
 

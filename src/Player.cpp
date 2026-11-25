@@ -1,4 +1,5 @@
-// - WHAT THIS FILE DOES: the player's hp, level, exp, bag/items, difficulty and the save/load of those (Zarnib's part)....
+//ZARNIB RAUF 26L-0769 member 2
+// - WHAT THIS FILE DOES: the player's hp, level, exp, bag/items, difficulty and the save/load of those (Zarnib's part)
 #include "PlayerInterface.h"
 #include <fstream>      // for reading and writing files.....
 #include <cstring>    
@@ -11,33 +12,25 @@ const int COUNT = 1;        // column 1 meantt how many of that item
 const int MAX_STACK = 99;   // we cannot carry more than 99 of one item
 const int NAME_LENGTH = 20; // the player's name can have at most 19 letters
 
+// how much of every hit the player really takes (%), by difficulty: easy, normal, hard
+// ON PURPOSE this STACKS with the bosses' attack % (ATK_PERCENT in Enemy.cpp): the two get multiplied,
+// so a boss hit is about 0.46x (easy) / 1x (normal) / 1.9x (hard) of the Normal damage. Traps and curses only get this table.
+static const int damageTakenPercent[3] = { 75, 100, 150 };
 
-// 2D array for levels where rows represent levels and columns represent the % of damage the player will take 
-//and  column 1 is enemy strength accoriding to level
-static const int difficultyTable[3][2] = {   //using static to prevent clashes with other files as it will be just private to this
-    { 75, 80 },     //  easy
-    { 100, 100 },   //  normal
-    { 150, 130 }    //  hard
-};
+// 2D array of letters:
 
-// 2D array of letters with 6 rows for each word and max character we could have is 16 including null terminator
-//its rows are in accordance with the ids they wrere given above
-//so  --- ROWS = IDs ---
-
-static const char itemNames[6][16] = {    
+static const char itemNames[6][16] = {
     "Healing Potion", "Poison Potion", "Buff Potion", "Relic Bag", "Key", "Key"
 };
 
-
 static const char itemDescriptions[6][60] = {
     "Restores 40 HP.",
-    "Looks like medicine... it is not. Costs 15 HP.",
-    "Raises your attack level by one.",                       //you can now attack with more strength
+    "Looks like medicine... it is not. It costs you HP.",
+    "Raises your attack level by one.",
     "All the relics you found, kept together in one bag.",
     "An old key. Does it fit a lock?",
     "An old key. Does it fit a lock?"
 };
-
 
 // Player infor and using static so that only this file can use these variables directly
 // Other files will  use the functions from PlayerInterface.h. header file
@@ -52,7 +45,7 @@ static int difficulty = DIFF_NORMAL;
 static unsigned int progressFlags = 0;      // many yes/no switches stored in one number
 static char playerName[NAME_LENGTH] = "Viktor";   
 
-// one bag slot is now a structure (PF notes: struct) instead of a row of a 2D array cuz an array can only store data of same dtatatypes 
+// one bag slot is now a structure (PF notes: struct) instead of a row of a 2D array.
 // it keeps the id, the name and the quantity together, so sorting can swap the whole Item at once
 // an empty slot has id -1, an empty name and quantity 0
 struct Item {
@@ -61,17 +54,14 @@ struct Item {
     int quantity;
 };
 
-//here item has become kinda data type 
-
 // inventory has 8 slots. -1 / "" / 0 means that the slot is emptyy...
 static Item slot[INVENTORY_SLOTS] = {
     {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}
 };
 
-static char lastError[100] = "";    // remembers the last file problem , if empty then no error
+static char lastError[100] = "";    // remembers the last file problem
 
-// Small .. FUNCIONS... only for this file use
-
+// Small helper functions only for this file use
 
 //  to find an item to use first check whether its present or not and then Looks through all slots and returns the slot number that holds this item.
 // Returning -1 if the item wasnt   in the bag.
@@ -107,24 +97,21 @@ static int totalItemsInBag(const Item bag[], int rows) {
     return totali;
 }
 
-// used recursion asking the function itself about next level exp until it reaches base case, as for moving towards next level we need to multiply each exp by 100
+// uses recursion: the exp for a level is the exp for the level before it plus 100 (level 1 = 100, level 2 = 200, ...)
 
 static int expNeeded(int levl) {
     if (levl <= 1) {
-        return 100;    //it will return 100 for easy level which is our first level
+        return 100;    //level 1 needs 100 exp
     }
     return expNeeded(levl - 1) + 100;
 }
 
-
 // Readi player data noww
-//getter function like they just rerurn the value as it is 
 
 int getPlayerHP()
  { return hp; }
 int getPlayerMaxHP() { return maxHp; }
 int getplayerAtk() { return 10 + (atkLevel - 1) * 5; }   //as attack strength and power will depend on level
-                                                        // so  level1=10 ,level2=15.....
 int getplayerAtkLevel() { return atkLevel; }
 int getPlayerMaxAttackLevel() { return maxAtkLevel; }
 int getDifficulty() { return difficulty; }
@@ -132,42 +119,49 @@ int getPlayerExp() { return expPoints; }
 int getPlayerLevel() { return level; }
 int getExpNeededForNextLevel() { return expNeeded(level); }
 bool isPlayerDead() { return hp <= 0; }    //if helath becomes 0.........
-int getEnemyStrengthPercent() { return difficultyTable[difficulty][1]; }   // the difficulty level and accordin to above mentioned grid enemy strength will be found and given to it from 1st column
 int getTotalItems() { return totalItemsInBag(slot, INVENTORY_SLOTS); }
-
 
 //changing the stats of player according ot the level it has......
 
 // Difficulty change damage like on hard: 10 * 150 / 100 = 15.
-void takeDamage(int amount) {
+// what a hit of this size really costs on the current difficulty (a hit always costs at least 1).
+// takeDamage uses it, and the battle uses it to show the same number in the curse text
+int damageAfterDifficulty(int amount) {
     if (amount <= 0) {
-        return;
-    }                                            //like for hard level we have 10 * 150 / 100 = 15  ....
-    int relDamage = amount * difficultyTable[difficulty][0] / 100;  //damage the player gets according to its level and enemy strength
+        return 0;
+    }
+    int relDamage = amount * damageTakenPercent[difficulty] / 100;
     if (relDamage < 1) {
         relDamage = 1;                 // a hit always hurts at least 1
     }
+    return relDamage;
+}
+
+void takeDamage(int amount) {
+    if (amount <= 0) {
+        return;
+    }
+    int relDamage = damageAfterDifficulty(amount);
     hp = hp - relDamage;
     if (hp < 0) {
         hp = 0;                         // as hp cant go below 0....
     }
 }
 
-//  two functions with the same name but different inputs = overloding
+//  two functions with the same name but different inputs to preven overloding
 
 void healPlayer(int amount) {
     if (amount <= 0) {
         return;
     }
     hp = hp + amount;
-    if (hp > maxHp) {       //like when you drink any potion kinda thing
+    if (hp > maxHp) {
         hp = maxHp;                     // hp cant go above the maximum
     }
 }
 
 void healPlayer() {  
-    hp = maxHp;                         // we use two functions to preevent overload as if there is no amount enter
-                                 //               then player heals fully like when you move or start a new game
+    hp = maxHp;                         // the version with no amount heals fully (nothing calls it right now: potions heal 40 and a level up heals itself)
 }
 
 void addExperience(int amount) {
@@ -180,7 +174,7 @@ void addExperience(int amount) {
     while (expPoints >= expNeeded(level)) {
         expPoints = expPoints - expNeeded(level);   // the extra exp is kept and the level will be automatically incremented
         level++;
-        maxHp = maxHp + 20;                          //also max hp will increase 
+        maxHp = maxHp + 20;                          //als max hp will increase 
         hp = maxHp;                                 // level up heals the player fully
     }
 }
@@ -308,7 +302,6 @@ bool addItem(int itemId) {
     return addItem(itemId, 1);
 }
 
-
 // Bubble sort for the bag (PF notes: sorting). arranges the slots alphabetically by item name
 //   - compare two neighbouring slots, swap them if the first name comes AFTER the second
 //   - go to the next pair, and repeat whole passes until a pass swaps nothing
@@ -374,18 +367,6 @@ const char* getPlayerName() {
     return playerName;
 }
 
-// strcmp gives 0 when two texts are exactly the same.
-// Both keys are called "Key", so the real key is found first.
-int findItemIdByName(const char* name) {
-    for (int i = 0; i < ITEM_TYPE_COUNT; i++) {
-        if (strcmp(itemNames[i], name) == 0) {
-            return i;
-        }
-    }
-    return -1;                          // not found
-}
-
-
 // (progress switches)  to track all achievements...
 // "progressFlags" is one number,
 //   |=      turns a switch ON
@@ -396,29 +377,6 @@ int findItemIdByName(const char* name) {
 void setProgressFlag(unsigned int flag) {
     progressFlags = progressFlags | flag;   //turning switch on 
 }
-
-void clearProgressFlag(unsigned int flag) {
-    progressFlags = progressFlags & ~flag;
-}
-
-bool hasProgressFlag(unsigned int flag) {
-
-    return (progressFlags & flag) != 0;
-}
-
-// Counts how many switches are ON.
-int countProgressFlags() {
-    unsigned int temp = progressFlags;
-    int count = 0;
-    while (temp != 0) {
-        if (temp & 1) {                 // is the last bit ON?
-            count++;
-        }
-        temp = temp >> 1;               // throw away the last bit
-    }
-    return count;
-}
-
 
 // New game
 // ------------------------------------------------------------
@@ -432,24 +390,21 @@ void resetPlayerToDefault() {
     progressFlags = 0;
     strcpy(playerName, "Viktor");
 
-    for (int i = 0; i < INVENTORY_SLOTS; i++) {     // emptying every slot.............
+    for (int i = 0; i < INVENTORY_SLOTS; i++) {     // empty every slot
         slot[i].id = -1;
         slot[i].name = "";
         slot[i].quantity = 0;
     }
 
-    addItem(ITEM_HEALING_POTION, 2);    // two healing potions given to Viktor  and he starts with NO relics, he has to find all of them
+    addItem(ITEM_HEALING_POTION, 2);    // two healing potions. Viktor starts with NO relics, he has to find all of them
 }
-
-
-
 
 // Checks if loaded numbers make sense. Throws a message if they do not.
 // (bag is a 2D array again, so we must write [2])
 static void checkLoadedData(int h, int mh, int lv, int atk, int ex, int diff, const int bag[][2]) {
     if (mh < 1 || h < 0 || h > mh) {
         throw "The save file might have wrong hp values";
-    }                                                      //this will be catched by last file error and it will be given to the menu or ui
+    }
     if (lv < 1 || ex < 0) {
         throw "The save file might havewrong level or exp values";
     }
@@ -466,7 +421,7 @@ static void checkLoadedData(int h, int mh, int lv, int atk, int ex, int diff, co
         if (bag[i][COUNT] < 0 || bag[i][COUNT] > MAX_STACK) {
             throw "The save file might have wrong item count";
         }
-        //  before this a slot could say "no item" (-1) but still hold a count, or hold
+        // bug fix: before this a slot could say "no item" (-1) but still hold a count, or hold
         // an item with a count of 0. both make the bag show/behave wrong, so we reject them
         if ((bag[i][ID] == -1 && bag[i][COUNT] != 0) || (bag[i][ID] >= 0 && bag[i][COUNT] == 0)) {
             throw "The save file has a bag slot that does not make sense";
@@ -497,7 +452,7 @@ static void useLoadedData(int h, int mh, int lv, int atk, int ex, int diff,
 // saving themm
 bool saveGameBackup(const string& filename) {
     try {
-        ofstream out(filename.c_str());          //writing  in the  file, it verwrites any existing filess..........
+        ofstream out(filename.c_str());
         if (!out.is_open()) {
             throw "Could not open the file for saving";
         }
@@ -507,9 +462,9 @@ bool saveGameBackup(const string& filename) {
         for (int i = 0; i < INVENTORY_SLOTS; i++) {
             out << slot[i].id << " " << slot[i].quantity << "\n";
         }
-        out.close();                  //closing the file for optimisation and to clear the storage......
-                                      // for this even if the file doesn exist , it will create one and write according to it
-        lastError[0] = '\0';            // no problem  , empty string
+        out.close();
+
+        lastError[0] = '\0';            // no problem
         return true;
     }
     catch (const char* message) {
@@ -521,7 +476,7 @@ bool saveGameBackup(const string& filename) {
 // ----- Load from the text file -----
 bool loadGameBackup(const string& filename) {
     try {
-        ifstream in(filename.c_str());    //read whatever written in this file and for this the file needs to exists before
+        ifstream in(filename.c_str());
         if (!in.is_open()) {
             throw "Save file not found";
         }
@@ -543,83 +498,6 @@ bool loadGameBackup(const string& filename) {
 
         checkLoadedData(h, mh, lv, atk, ex, diff, bag);     // may throw
         useLoadedData(h, mh, lv, atk, ex, diff, flags, bag);
-
-        lastError[0] = '\0';
-        return true;
-    }
-    catch (const char* message) {
-        strcpy(lastError, message);
-        return false;
-    }
-}
-
-
-bool saveGameBinary(const string& filename) {
-    try {
-        ofstream out(filename.c_str(), ios::binary);
-        if (!out.is_open()) {
-            throw "Could not open the file for saving";
-        }
-
-        out.write((char*)&hp, sizeof(hp));
-        out.write((char*)&maxHp, sizeof(maxHp));
-        out.write((char*)&level, sizeof(level));
-        out.write((char*)&atkLevel, sizeof(atkLevel));
-        out.write((char*)&expPoints, sizeof(expPoints));
-        out.write((char*)&difficulty, sizeof(difficulty));
-        out.write((char*)&progressFlags, sizeof(progressFlags));
-        // bug fix: slot is an array of Item structs now and an Item holds a string, so writing the raw
-        // bytes of the whole array would save a useless pointer. we copy id + quantity into a plain
-        // int table first. it is the same 8 x 2 layout as before, so old binary saves still load
-        int bag[INVENTORY_SLOTS][2];
-        for (int i = 0; i < INVENTORY_SLOTS; i++) {
-            bag[i][ID] = slot[i].id;
-            bag[i][COUNT] = slot[i].quantity;
-        }
-        out.write((char*)bag, sizeof(bag));
-        out.write(playerName, NAME_LENGTH);
-        out.close();
-
-        lastError[0] = '\0';
-        return true;
-    }
-    catch (const char* message) {
-        strcpy(lastError, message);
-        return false;
-    }
-}
-
-// ----- Load from the binary file (must read in the SAME order we had writtten it
-bool loadGameBinary(const string& filename) {
-    try {
-        ifstream in(filename.c_str(), ios::binary);
-        if (!in.is_open()) {
-            throw "Save file not found";
-        }
-
-        int h, mh, lv, atk, ex, diff;
-        unsigned int flags;
-        int bag[INVENTORY_SLOTS][2];
-        char newName[NAME_LENGTH];
-
-        in.read((char*)&h, sizeof(h));
-        in.read((char*)&mh, sizeof(mh));
-        in.read((char*)&lv, sizeof(lv));
-        in.read((char*)&atk, sizeof(atk));
-        in.read((char*)&ex, sizeof(ex));
-        in.read((char*)&diff, sizeof(diff));
-        in.read((char*)&flags, sizeof(flags));
-        in.read((char*)bag, sizeof(bag));
-        in.read(newName, NAME_LENGTH);
-        if (in.fail()) {
-            throw "The save file is damaged or too short";
-        }
-        in.close();
-
-        newName[NAME_LENGTH - 1] = '\0';                // making sure the text ends
-        checkLoadedData(h, mh, lv, atk, ex, diff, bag); // may throw
-        useLoadedData(h, mh, lv, atk, ex, diff, flags, bag);
-        strcpy(playerName, newName);
 
         lastError[0] = '\0';
         return true;

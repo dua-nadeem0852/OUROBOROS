@@ -1,5 +1,5 @@
 //DUA NADEEM 26L-0852 member 3
-/*first-person battle screen
+/*battle screen
 only draws, animates and reads keys. rules in Battle.cpp / Enemy.cpp.
 ART:
 assets/sprites/scientist.png, bat.png, hydra.png   boss pictures (transparent PNG, any size)
@@ -26,12 +26,17 @@ static const float GROUND_Y = 550.f;                  //where the boss feet touc
 static const float PANEL_Y = 560.f;                  //top of the bottom row of panels
 static const float PANEL_H = 145.f;
 
-static const float BOSS_HEIGHT[ENEMY_TYPE_COUNT] = { 350.f, 385.f, 385.f };   //in boss order (scentist,bat,hydra)
+static const float BOSS_HEIGHT[ENEMY_TYPE_COUNT] = { 350.f, 385.f, 385.f };   //in boss order (scientist,bat,hydra)
 static const char* BOSS_FILE[ENEMY_TYPE_COUNT] = { "assets/sprites/scientist.png","assets/sprites/bat.png", "assets/sprites/hydra.png" };
+static const unsigned LOG_TEXT_SIZE = 22;             //size of the text in the battle text box
+static const int LOG_MAX_LINES = 4;                   //how many lines of it fit in the box
+static const sf::Color HP_RED(235, 75, 75);           //hp words and numbers in the text box
+static const float ENEMY_TURN_DELAY = 0.9f;           //seconds between the players move and the bosses answer
+static const float VIKTOR_HURT_TIME = 0.5f;           //how long viktor shakes and stays red when he is hit
 static const bool SMOOTH_BOSS_SPRITES = true;            //for a pixelated look, make it false
 static const char* VIKTOR_FILE = "assets/sprites/viktor_battle.png";
 
-//were each Hydra head is inside hydra.png (fractions of its width / height)
+//where each Hydra head is inside hydra.png (fractions of its width / height)
 static const float HEAD_FX[HYDRA_HEADS] = { 0.17f, 0.61f, 0.85f };
 static const float HEAD_FY[HYDRA_HEADS] = { 0.19f, 0.08f, 0.26f };
 
@@ -41,7 +46,11 @@ static bool inItemGrid = false;
 static bool showLog = true;                           //if true it shows the text box shows what just happened
 static std::string notice = "";                       //message that replaces the text box
 
+static float enemyTurnAt = 0.f;                       //when the pending boss answer is allowed to happen
+static bool waitingForBoss = false;
 static float enemyHitTime = -10.f, playerHurtTime = -10.f, wonTime = -1.f;          //hit effects 
+static float headDiedAt[HYDRA_HEADS] = { -10.f, -10.f, -10.f };      //when each hydra head died, for its death effect
+static bool headSeenAlive[HYDRA_HEADS] = { true, true, true };
 
 static const int MAX_NUMS = 8;                        //floating dmg numbers
 static std::string numText[MAX_NUMS];
@@ -65,8 +74,11 @@ static void syncUiToBattle()      //once a new battle starts, reset the screen
     lastRoundSeen = roundCounter();
     enemyHitTime = playerHurtTime = -10.f;
     wonTime = -1.f;
+    for (int i = 0; i < HYDRA_HEADS; i++) { headDiedAt[i] = -10.f; headSeenAlive[i] = true; }
     for (int i = 0; i < MAX_NUMS; i++) numActive[i] = false;
     clearBattleSounds();
+    setEnemyTurnDelay(true);                          //the boss answers a moment after our move, not in the same instant
+    waitingForBoss = false;
     startBattleMusic(getEnemyType());
 }
 
@@ -250,7 +262,53 @@ static void drawSummonedBats(sf::RenderWindow& window, float t, sf::Uint8 alpha)
     }
 }
 
-static void drawHydraHeads(sf::RenderWindow& window, const sf::Font& font, float left, float top, float w, float h)
+static sf::Color withFade(sf::Color c, float f)       //same colour but see through by f (1 = as is, 0 = invisible)
+{
+    c.a = (sf::Uint8)(c.a * f);
+    return c;
+}
+
+static float bossFade(float t)                        //1 while the boss is there, falls to 0 after victory (same timing as the boss sprite)
+{
+    if (wonTime < 0.f) return 1.f;
+    float k = 1.f - (t - wonTime) / 1.3f;
+    return (k <= 0.f) ? 0.f : k;
+}
+
+static void drawHeadDeath(sf::RenderWindow& window, float hx, float hy, float since, float bossAlpha)   //white flash + expanding ring, then a red X stays
+{
+    if (since < 0.25f)
+    {
+        sf::CircleShape flash(34.f);
+        flash.setOrigin(34.f, 34.f);
+        flash.setPosition(hx, hy);
+        flash.setFillColor(sf::Color(255, 255, 255, (sf::Uint8)(255.f * (1.f - since / 0.25f) * bossAlpha)));
+        window.draw(flash);
+    }
+    if (since < 0.6f)
+    {
+        float k = since / 0.6f, r = 30.f + 60.f * k;
+        sf::CircleShape ring(r);
+        ring.setOrigin(r, r);
+        ring.setPosition(hx, hy);
+        ring.setFillColor(sf::Color::Transparent);
+        ring.setOutlineColor(sf::Color(255, 190, 110, (sf::Uint8)(230.f * (1.f - k) * bossAlpha)));
+        ring.setOutlineThickness(4.f);
+        window.draw(ring);
+    }
+    float fade = (since < 0.3f) ? since / 0.3f : 1.f;     //the X fades in
+    for (int s = -1; s <= 1; s += 2)
+    {
+        sf::RectangleShape bar(sf::Vector2f(46.f, 7.f));
+        bar.setOrigin(23.f, 3.5f);
+        bar.setPosition(hx, hy);
+        bar.setRotation(45.f * s);
+        bar.setFillColor(sf::Color(190, 60, 60, (sf::Uint8)(220.f * fade * bossAlpha)));   //fades out together with the hydra
+        window.draw(bar);
+    }
+}
+
+static void drawHydraHeads(sf::RenderWindow& window, const sf::Font& font, float t, float left, float top, float w, float h, float bossAlpha)
 {
     int target = getTargetHead();
     for (int i = 0; i < HYDRA_HEADS; i++)
@@ -258,16 +316,18 @@ static void drawHydraHeads(sf::RenderWindow& window, const sf::Font& font, float
         float hx = left + HEAD_FX[i] * w, hy = top + HEAD_FY[i] * h;
         bool alive = isHeadAlive(i);
 
-        sf::CircleShape mark(alive ? 34.f : 30.f);          //defeated head: dark patch. guarding head: blue ring
+        sf::CircleShape mark(34.f);          //defeated head: dark patch. guarding head: blue ring
         mark.setOrigin(mark.getRadius(), mark.getRadius());
         mark.setPosition(hx, hy);
 
-        if (!alive) { mark.setFillColor(sf::Color(8, 6, 10, 200)); window.draw(mark); }
-        else if (isHeadDefending(i)) { mark.setFillColor(sf::Color::Transparent); mark.setOutlineColor(sf::Color(110, 180, 255)); mark.setOutlineThickness(3.f); window.draw(mark); }
+        if (headSeenAlive[i] && !alive) headDiedAt[i] = t;     //it just died, start the death effect
+        headSeenAlive[i] = alive;
+        if (!alive) drawHeadDeath(window, hx, hy, t - headDiedAt[i], bossAlpha);
+        else if (isHeadDefending(i)) { mark.setFillColor(sf::Color::Transparent); mark.setOutlineColor(sf::Color(110, 180, 255, (sf::Uint8)(255.f * bossAlpha))); mark.setOutlineThickness(3.f); window.draw(mark); }
 
         float barX = hx - 58.f, barY = hy - 48.f;
-        drawBar(window, barX, barY, 116.f, 9.f, getHeadHP(i), getHeadMaxHP(i), alive ? sf::Color(190, 45, 45) : sf::Color(70, 70, 70));
-        drawText(window, font, std::to_string(i + 1), 15, barX - 18.f, barY - 6.f, alive ? TEXT_COLOR : DIM_COLOR);
+        drawBar(window, barX, barY, 116.f, 9.f, getHeadHP(i), getHeadMaxHP(i), alive ? sf::Color(190, 45, 45) : sf::Color(70, 70, 70), bossAlpha);
+        drawText(window, font, std::to_string(i + 1), 15, barX - 18.f, barY - 6.f, withFade(alive ? TEXT_COLOR : DIM_COLOR, bossAlpha));
         if (i == target && alive && getBattleResult() == BATTLE_ONGOING && !inItemGrid)
         drawTriangle(window, hx - 7.f, barY - 24.f, 14.f, true, GOLD);      //the head player  will hit
     }
@@ -298,32 +358,34 @@ static void drawBoss(sf::RenderWindow& window, const sf::Font& font, float t)
     if (tex) drawSprite(window, tex, cx + dx, GROUND_Y + dy, height, tint, stretch, rot, left, top, w, h);
     else
     {
-        sf::RectangleShape box(sf::Vector2f(w, h));   //made a placeholder for the picture if it doenst exist
+        sf::RectangleShape box(sf::Vector2f(w, h));   //plain box if the picture file does not exist
         box.setPosition(left + dx, top + dy);
         box.setFillColor(sf::Color(90, 60, 70, (sf::Uint8)alpha));
         window.draw(box);
     }
 
     if (type == ENEMY_HUMANOID_BAT) drawSummonedBats(window, t, (sf::Uint8)alpha);
-    if (type == ENEMY_HYDRA && alpha > 0) drawHydraHeads(window, font, left, top, w, h);
+    if (type == ENEMY_HYDRA && alpha > 0) drawHydraHeads(window, font, t, left, top, w, h, alpha / 255.f);
 }
 
 //panels
-static void drawEnemyPanel(sf::RenderWindow& window, const sf::Font& font)       //topleft
+static void drawEnemyPanel(sf::RenderWindow& window, const sf::Font& font, float t)       //topleft
 {
-    drawPanel(window, 20.f, 16.f, 250.f, 76.f);
-    drawCenteredText(window, font, getEnemyName(), 22, 145.f, 20.f);
-    drawText(window, font, "HP", 17, 34.f, 50.f, GOLD);
-    drawText(window, font, std::to_string(getEnemyHP()) + " / " + std::to_string(getEnemyMaxHP()), 17, 68.f, 50.f);
-    drawBar(window, 34.f, 76.f, 222.f, 8.f, getEnemyHP(), getEnemyMaxHP(), sf::Color(190, 45, 45));
+    float f = bossFade(t);                            //the whole panel fades away with the boss after victory
+    if (f <= 0.f) return;
+    drawPanel(window, 20.f, 16.f, 250.f, 76.f, f);
+    drawCenteredText(window, font, getEnemyName(), 22, 145.f, 20.f, withFade(TEXT_COLOR, f));
+    drawText(window, font, "HP", 17, 34.f, 50.f, withFade(GOLD, f));
+    drawText(window, font, std::to_string(getEnemyHP()) + " / " + std::to_string(getEnemyMaxHP()), 17, 68.f, 50.f, withFade(TEXT_COLOR, f));
+    drawBar(window, 34.f, 76.f, 222.f, 8.f, getEnemyHP(), getEnemyMaxHP(), sf::Color(190, 45, 45), f);
 
     int type = getEnemyType();                        //hint under the panel thats boss specific
     if (type == ENEMY_MAD_SCIENTIST && getScientistPower() > 0)
-    drawText(window, font, "Power-ups: " + std::to_string(getScientistPower()), 15, 24.f, 100.f, sf::Color(255, 170, 90));
+    drawText(window, font, "Power-ups: " + std::to_string(getScientistPower()), 15, 24.f, 100.f, withFade(sf::Color(255, 170, 90), f));
     if (type == ENEMY_HUMANOID_BAT && getBatCount() > 0)
-    drawText(window, font, "Summoned bats: " + std::to_string(getBatCount()), 15, 24.f, 100.f, sf::Color(205, 170, 255));
+    drawText(window, font, "Summoned bats: " + std::to_string(getBatCount()), 15, 24.f, 100.f, withFade(sf::Color(205, 170, 255), f));
     if (type == ENEMY_HYDRA)
-    drawText(window, font, "The heads wail in " + std::to_string(hydraTurnsUntilWail()) + " turn(s)", 15, 24.f, 100.f, sf::Color(235, 120, 120));
+    drawText(window, font, "The heads wail in " + std::to_string(hydraTurnsUntilWail()) + " turn(s)", 15, 24.f, 100.f, withFade(sf::Color(235, 120, 120), f));
 }
 
 static void drawPartyPanel(sf::RenderWindow& window, const sf::Font& font, float t)     //bottomleft
@@ -335,8 +397,19 @@ static void drawPartyPanel(sf::RenderWindow& window, const sf::Font& font, float
     {
         float dx, dy, stretch, rot, l, tp, w, h;
         idleMotion(-1, t, dx, dy, stretch, rot);
-        dx += shake(t - playerHurtTime, 0.3f, 6.f, 70.f);                 //flinches when hurt
-        drawSprite(window, tex, 76.f + dx, PANEL_Y + PANEL_H - 8.f + dy, (float)tex->getSize().y, sf::Color::White, stretch, rot, l, tp, w, h);
+        float since = t - playerHurtTime;
+        dx += shake(since, VIKTOR_HURT_TIME, 18.f, 75.f);                 //flinches HARD when hurt
+        dy += shake(since, VIKTOR_HURT_TIME, 7.f, 95.f);
+        rot += shake(since, VIKTOR_HURT_TIME, 5.f, 60.f);
+
+        sf::Color tint = sf::Color::White;                                //and goes red while it lasts
+        if (since >= 0.f && since < VIKTOR_HURT_TIME)
+        {
+            float k = (since < 0.3f) ? 1.f : 1.f - (since - 0.3f) / (VIKTOR_HURT_TIME - 0.3f);   //fully red first, then fades back
+            int drop = (int)(190.f * k);
+            tint = sf::Color(255, (sf::Uint8)(255 - drop), (sf::Uint8)(255 - drop));
+        }
+        drawSprite(window, tex, 76.f + dx, PANEL_Y + PANEL_H - 8.f + dy, (float)tex->getSize().y, tint, stretch, rot, l, tp, w, h);
     }
 
     drawText(window, font, "Viktor", 20, 135.f, PANEL_Y + 8.f, GOLD);
@@ -400,6 +473,68 @@ static void drawItemGrid(sf::RenderWindow& window, const sf::Font& font, float s
     }
 }
 
+//one line of the text box and which of its words are about HP
+struct TextRow { std::string text; std::vector<bool> red; };
+
+static std::vector<TextRow> buildRows(const sf::Font& font, const std::vector<std::string>& paragraphs, float width, unsigned size)
+{
+    std::vector<TextRow> rows;
+    for (size_t p = 0; p < paragraphs.size(); p++)
+    {
+        std::vector<bool> flags = hpWordFlags(paragraphs[p]);                //one flag per word of this paragraph
+        std::vector<std::string> part = wrapText(font, paragraphs[p], size, width);
+        size_t wordNo = 0;                                                    //wrapText keeps the words in order, so we just keep counting
+        for (size_t l = 0; l < part.size(); l++)
+        {
+            TextRow row;
+            row.text = part[l];
+            bool inWord = false;
+            for (size_t c = 0; c <= part[l].size(); c++)
+            {
+                bool letter = (c < part[l].size() && part[l][c] != ' ');
+                if (letter) inWord = true;
+                else if (inWord) { row.red.push_back(wordNo < flags.size() && flags[wordNo]); wordNo++; inWord = false; }
+            }
+            rows.push_back(row);
+        }
+    }
+    return rows;
+}
+
+//like drawWrapped but the words that are about HP (hpWordFlags in Battle.cpp) are drawn in red
+static void drawTextBox(sf::RenderWindow& window, const sf::Font& font, const std::vector<std::string>& paragraphs,
+                        float x, float y, float width, int maxLines, unsigned size)
+{
+    std::vector<TextRow> rows = buildRows(font, paragraphs, width, size);
+    if ((int)rows.size() > maxLines && size > 18)       //more text than the box can hold (a long hydra round): smaller letters, one more line
+    {
+        size -= 4;
+        maxLines += 1;
+        rows = buildRows(font, paragraphs, width, size);
+    }
+
+    int first = ((int)rows.size() > maxLines) ? (int)rows.size() - maxLines : 0;     //still too long: show the last lines
+    for (int i = first; i < (int)rows.size(); i++)
+    {
+        float lineY = y + (i - first) * (size + 7.f);
+        sf::Text whole(rows[i].text, font, size);                             //only used to find where each word starts
+        float startX = whole.findCharacterPos(0).x;
+        size_t wordStart = 0;
+        int wordNo = 0;
+        for (size_t c = 0; c <= rows[i].text.size(); c++)
+        {
+            if (c < rows[i].text.size() && rows[i].text[c] != ' ') continue;
+            if (c > wordStart)
+            {
+                float wordX = x + whole.findCharacterPos(wordStart).x - startX;
+                drawText(window, font, rows[i].text.substr(wordStart, c - wordStart), size, wordX, lineY, rows[i].red[wordNo] ? HP_RED : TEXT_COLOR);
+                wordNo++;
+            }
+            wordStart = c + 1;
+        }
+    }
+}
+
 //text box says: a notice or what just happened or help for the highlighted choice
 static std::vector<std::string> textBoxLines()
 {
@@ -427,7 +562,7 @@ static void drawBottomPanels(sf::RenderWindow& window, const sf::Font& font)
     {
         drawPanel(window, 312.f, PANEL_Y, screenW - 332.f, PANEL_H);
         drawItemGrid(window, font, 326.f);
-        drawWrapped(window, font, textBoxLines(), 768.f, PANEL_Y + 14.f, screenW - 802.f, 5);
+        drawTextBox(window, font, textBoxLines(), 768.f, PANEL_Y + 14.f, screenW - 802.f, LOG_MAX_LINES, LOG_TEXT_SIZE);
         return;
     }
 
@@ -447,7 +582,7 @@ static void drawBottomPanels(sf::RenderWindow& window, const sf::Font& font)
     }
 
     drawPanel(window, 504.f, PANEL_Y, screenW - 524.f, PANEL_H);          //text box
-    drawWrapped(window, font, textBoxLines(), 520.f, PANEL_Y + 14.f, screenW - 556.f, 5);
+    drawTextBox(window, font, textBoxLines(), 520.f, PANEL_Y + 14.f, screenW - 556.f, LOG_MAX_LINES, LOG_TEXT_SIZE);
 }
 
 static void drawIntro(sf::RenderWindow& window, const sf::Font& font)    //boss 1 dailogue (scientist)
@@ -455,7 +590,7 @@ static void drawIntro(sf::RenderWindow& window, const sf::Font& font)    //boss 
     drawPanel(window, 20.f, PANEL_Y, screenW - 40.f, PANEL_H);
     drawText(window, font, getEnemyName(), 22, 40.f, PANEL_Y + 12.f, GOLD);
     std::vector<std::string> line(1, getIntroLine(getIntroIndex()));
-    drawWrapped(window, font, line, 40.f, PANEL_Y + 46.f, screenW - 80.f, 3, 20);
+    drawWrapped(window, font, line, 40.f, PANEL_Y + 46.f, screenW - 80.f, 3, 24);
     drawTriangle(window, screenW - 52.f, PANEL_Y + 118.f, 12.f, true, GOLD);
 }
 
@@ -465,6 +600,11 @@ void drawBattleScreen(sf::RenderWindow& window, const sf::Font& font)
     syncUiToBattle();
     sf::View view = makeView(window);                 //also sets screen width for this frame
     float t = animTime();
+    if (isEnemyTurnPending())                         //the player moved: wait a little, then the boss answers
+    {
+        if (!waitingForBoss) { waitingForBoss = true; enemyTurnAt = t + ENEMY_TURN_DELAY; }
+        else if (t >= enemyTurnAt) { waitingForBoss = false; runPendingEnemyTurn(); }
+    }
     updateBattleSounds();
     updateEffects(t);
 
@@ -487,7 +627,7 @@ void drawBattleScreen(sf::RenderWindow& window, const sf::Font& font)
     }
 
     if (isInIntro()) { drawIntro(window, font); return; }
-    drawEnemyPanel(window, font);
+    drawEnemyPanel(window, font, t);
     drawPartyPanel(window, font, t);
     drawBottomPanels(window, font);
 }
@@ -496,6 +636,7 @@ bool handleBattleKey(sf::Keyboard::Key key)
 {
     if (!isBattleActive()) return true;
     syncUiToBattle();
+    if (isEnemyTurnPending()) return false;          //the boss is about to answer, no keys until then
     bool confirm = (key == sf::Keyboard::Enter || key == sf::Keyboard::Space);
 
     if (isInIntro())   //dialogue before fight

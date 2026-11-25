@@ -1,5 +1,6 @@
-//Story.cpp    story text (first draft)
-//relics are told in the order the player finds them. not by where they are on the map
+//AMINA AHMAD SYED 26L-0760 member 1
+//Story.cpp    all the story text: relic stories, intro, ending and credits
+//every relic always has the same story, whatever order they are found in (Map.cpp says which tile gives which one)
 #include "Story.h"
 
 static const std::string RELIC_TITLES[RELIC_COUNT] = {

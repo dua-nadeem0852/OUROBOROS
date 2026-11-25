@@ -56,29 +56,29 @@ void drawCenteredText(sf::RenderWindow& window, const sf::Font& font, const std:
     window.draw(t);
 }
 
-void drawPanel(sf::RenderWindow& window, float x, float y, float w, float h)
+void drawPanel(sf::RenderWindow& window, float x, float y, float w, float h, float fade)
 {
     sf::RectangleShape outer(sf::Vector2f(w, h));
     outer.setPosition(x, y);
-    outer.setFillColor(sf::Color(10, 8, 14, 230));
-    outer.setOutlineColor(sf::Color(120, 96, 72));
+    outer.setFillColor(sf::Color(10, 8, 14, (sf::Uint8)(230.f * fade)));
+    outer.setOutlineColor(sf::Color(120, 96, 72, (sf::Uint8)(255.f * fade)));
     outer.setOutlineThickness(2.f);
     window.draw(outer);
 
     sf::RectangleShape inner(sf::Vector2f(w - 8.f, h - 8.f));
     inner.setPosition(x + 4.f, y + 4.f);
     inner.setFillColor(sf::Color::Transparent);
-    inner.setOutlineColor(sf::Color(58, 44, 42));
+    inner.setOutlineColor(sf::Color(58, 44, 42, (sf::Uint8)(255.f * fade)));
     inner.setOutlineThickness(1.f);
     window.draw(inner);
 }
 
-void drawBar(sf::RenderWindow& window, float x, float y, float w, float h, int value, int maxValue, sf::Color fill)
+void drawBar(sf::RenderWindow& window, float x, float y, float w, float h, int value, int maxValue, sf::Color fill, float fade)
 {
     sf::RectangleShape back(sf::Vector2f(w, h));
     back.setPosition(x, y);
-    back.setFillColor(sf::Color(30, 26, 32));
-    back.setOutlineColor(sf::Color(90, 80, 75));
+    back.setFillColor(sf::Color(30, 26, 32, (sf::Uint8)(255.f * fade)));
+    back.setOutlineColor(sf::Color(90, 80, 75, (sf::Uint8)(255.f * fade)));
     back.setOutlineThickness(1.f);
     window.draw(back);
 
@@ -88,6 +88,7 @@ void drawBar(sf::RenderWindow& window, float x, float y, float w, float h, int v
     sf::RectangleShape front(sf::Vector2f(w * ratio, h));
 
     front.setPosition(x, y);
+    fill.a = (sf::Uint8)(fill.a * fade);
     front.setFillColor(fill);
     window.draw(front);
 }

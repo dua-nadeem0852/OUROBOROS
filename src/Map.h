@@ -1,3 +1,4 @@
+//AMINA AHMAD SYED 26L-0760 member 1
 // Map.h - the map and walking around on it (Amina's part)
 // WHAT THIS FILE DOES: lists the map functions other files can call, the tile letters and
 // the RESULT_ numbers that say what happened. the code itself is in Map.cpp.
@@ -42,7 +43,7 @@ const int RESULT_RELIC = 5;     // picked up a relic, game should show its story
 const int RESULT_FULL = 6;     // wanted to pick something up but the bag is full
 const int RESULT_LOCKED = 7;     // chest cannot be opened yet
 const int RESULT_CHEST = 8;     // chest opened! ending time
-const int RESULT_TALK = 9;     // talked to an npc or read a clue (the text is in getMapMessage
+const int RESULT_TALK = 9;     // talked to an npc or read a clue (the text is in getMapMessage)
 const int RESULT_CHEST_BOSS = 10; // chest dialogue, then Hydra encounter
 const int CHEST_ROW = 5;          // where the hidden chest is (it only shows up once the Bat's key is in the bag)
 const int CHEST_COL = 8;
@@ -53,10 +54,6 @@ bool checkBoundaries(int row, int col);        // true if the tile is inside the
 bool movePlayer(int rowChange, int colChange); // moves 1 tile, false if it would leave the map
 void revealTile(int row, int col);             // shows a tile (and the ones around it)
 
-char getTileType(int row, int col);            // the letter on that tile
-const Tile& getTile(int row, int col);         // the whole Tile (a wall-like blank tile if row/col is outside the map)
-bool isTileTriggered(int row, int col);        // true for a trap/hole that already went off
-bool isRevealed(int row, int col);
 int  getPlayerRow();
 int  getPlayerCol();
 int  getEnemyTypeAt(int row, int col);         // ENEMY_... from Enemy.h, or ENEMY_NONE
@@ -70,7 +67,6 @@ int  getLastRelicIndex();                      // which relic (0, 1, 2...) was f
 
 bool saveMapState(const std::string& filename);   // see SaveSystem.cpp, saves tiles, position, beaten bosses
 bool loadMapState(const std::string& filename);   // false if the file is missing or looks broken
-bool everythingReachable();                       // true if walls don't cut anything off
 
 void drawMap(sf::RenderWindow& window, const sf::Font& font);
 

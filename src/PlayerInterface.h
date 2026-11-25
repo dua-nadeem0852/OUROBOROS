@@ -1,13 +1,10 @@
+//ZARNIB RAUF 26L-0769 member 2
 //PlayerInterface.h ------- WHAT THIS FILE DOES: the list of player/bag functions everyone else calls (code is in Player.cpp)
-//it contains a list of all the functions members 1 and 3 will be able to call from here...
-//It only DECLARES functions It's really easy to summon units,
+//it only DECLARES functions (and item / difficulty constants), so Map, Battle and Screens never touch Player.cpp's variables directly
 
-#ifndef PLAYER_INTERFACE_H     // "including  guard into it to  prevents double inclusion of this file, it will check whteher its defined or not if its not defined then
-                               // this file will run otherwise if already defined means it exists before then then that 
-                               //defined will be already checked with yes so it will end.....
+#ifndef PLAYER_INTERFACE_H     // include guard: stops this file from being included twice
 #define PLAYER_INTERFACE_H
 #include <string>
-
 
 //  Item identifiers 
 // instead of using the numbers we use their names and it will automatically give it a number
@@ -38,11 +35,12 @@ int getPlayerHP();
 int getPlayerMaxHP();
 int getplayerAtk();          //dmg a normal atk of the player deals depending on their atk level
 int getplayerAtkLevel();     
-int getPlayerMaxAttackLevel();  //to be decided
+int getPlayerMaxAttackLevel();  //the highest attack level the player can reach (3)
 int getDifficulty();
 
 //update player stats                            (one should keep HP within 0 to max hp inside these)
-void takeDamage(int amount);
+void takeDamage(int amount);            //the difficulty % is applied inside, so the HP lost is not always 'amount'
+int damageAfterDifficulty(int amount);  //what a hit of that size really costs on this difficulty (min 1), without hurting anyone
 void healPlayer(int amount);
 void addExperience(int amount);
 void increasePlayerMaxHP(int amount);   //combat calls this with (boss exp / 2)
@@ -55,53 +53,36 @@ int getSlotItemCount(int slot);   //counts copies of anitem that are stacked in 
 
 bool hasItem(int itemId);
 int getItemCount(int itemId);
-bool useItem(int itemId);        // removes one and affects hp (healing or poison). buffs are handled in combat. it will return false if item unavailable
+bool useItem(int itemId);        // removes one and applies it: healing restores HP, poison costs HP, a buff raises the attack level by one for good
+                                 // (Battle.cpp adds the extra x1.5 for a few rounds on top). false if it is not in the bag or would do nothing
 bool addItem(int itemId);        //returns false if inventory is full
 void sortInventory();            //bubble sort: puts the bag in A-Z order by item name (empty slots go last)
 std::string getItemName(int itemId);    // both keys return "Key"
-
-
-
 
 int  getPlayerExp();
 int  getPlayerLevel();
 int  getExpNeededForNextLevel();   // for the exp bar
 void setDifficulty(int diff);
 bool isPlayerDead();
-int  getEnemyStrengthPercent();          // This will be used in combating by member3.  80/100/130 depending on dfficulty levels
-int  getTotalItems();                      // total items carried (uses recursion)
+int  getTotalItems();                      // total items carried (adds up the slots with a loop)
 
 const char* getItemDescription(int itemId);
-
 
 // using c strings for player naem
 void setPlayerName(const char* newName);
 const char* getPlayerName();
 
-
-
 // flagss
 
 void setProgressFlag(unsigned int flag);     //  to turn a awitch on...
-void clearProgressFlag(unsigned int flag);  // if used then set back to 0 or off
-bool hasProgressFlag(unsigned int flag);  // checking if the specific switch is on
-
-
-
-int  countProgressFlags();          // counting how many switches are currently on or how many things it have rn
-
-//Looks up items based on a text (C-string compare). Returns -1 if there is no return.
-int findItemIdByName(const char* name);
 
 // starting the game from start ....
 void resetPlayerToDefault();
 
 // Saving / loading                                                      //we writing string herre cuz we are expecting a text sentence here...
-                                                                       //when player hits save or he moves to next level his stats are save
+                                                                       //the game saves from the pause menu (S), see SaveSystem.cpp
 bool saveGameBackup(const std::string& filename ="save_backup.txt");   // it writes readable text backup for game state and returns true if its saving was completed
 bool loadGameBackup(const std::string& filename ="save_backup.txt");  //reads back the txt file so that layer can continue...
-bool saveGameBinary(const std::string& filename ="save_backup.bin");  //writing in binary as it is smaller, faster, difficult to edit by someone else in notepad
-bool loadGameBinary(const std::string& filename ="save_backup.bin");
 const char* getLastFileError();       // instead of just showing that the file has failed to load we shwo the error message why its failed
 
 #endif

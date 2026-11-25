@@ -1,6 +1,6 @@
 //DUA NADEEM 26L-0852 member 3
 //UiDraw.h - WHAT THIS FILE DOES: lists the small drawing helpers (code is in UiDraw.cpp)
-//small drawing helpers used by the battle screen
+//small drawing helpers used by the whole game (map, menus and battle screen)
 //it only draws text, panels, bars, sprites
 #ifndef UI_DRAW_H
 #define UI_DRAW_H
@@ -21,8 +21,8 @@ sf::Texture* loadTexture(const std::string& path, bool smooth = false);
 void drawText(sf::RenderWindow& window, const sf::Font& font, const std::string& text, unsigned size, float x, float y, sf::Color color = TEXT_COLOR);
 void drawCenteredText(sf::RenderWindow& window, const sf::Font& font, const std::string& text, unsigned size, float centerX, float y, sf::Color color = TEXT_COLOR);
 
-void drawPanel(sf::RenderWindow& window, float x, float y, float w, float h);     //double frame
-void drawBar(sf::RenderWindow& window, float x, float y, float w, float h, int value, int maxValue, sf::Color fill);
+void drawPanel(sf::RenderWindow& window, float x, float y, float w, float h, float fade = 1.f);     //double frame
+void drawBar(sf::RenderWindow& window, float x, float y, float w, float h, int value, int maxValue, sf::Color fill, float fade = 1.f);   //fade 1 = normal, 0 = invisible
 void drawTriangle(sf::RenderWindow& window, float x, float y, float size, bool pointDown, sf::Color color);
 
 //draws a sprite standing on the floor at (centerX, feetY), scaled to 'height'

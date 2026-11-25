@@ -11,7 +11,7 @@ static const float SFX_VOLUME= 70.f;    //0 to 100
 static const float MUSIC_VOLUME = 50.f;    //0 to 100
 static const float PITCH_VARIATION = 0.08f;   //hits/hurts change pitch upto +-8% so they don't sound identical every time (0 = off)
 
-//which file plays for which event. [have to change the names to match my own files.]
+//which file plays for which event
 //order matches the SND_ list in Battle.h
 static const int TOTAL_SOUNDS = SND_COUNT + 3;      //battle + 3menu sounds
 static const char* SOUND_FILES[TOTAL_SOUNDS] ={
@@ -29,6 +29,8 @@ static const char* SOUND_FILES[TOTAL_SOUNDS] ={
     "assets/sounds/scientist_hit.wav",    //SND_SCIENTIST_HIT (scientist gets hurt)
     "assets/sounds/bat_hit.wav",          //SND_BAT_HIT (bat gets hurt)
     "assets/sounds/hydra_hit.wav",        //SND_HYDRA_HIT (hydra gets hurt)
+    "assets/sounds/defend.wav",           //SND_DEFEND (viktor braces himself)
+    "assets/sounds/step.wav",             //SND_STEP (a step in explore mode)
     "assets/sounds/ui_move.wav",          //menu cursor moved
     "assets/sounds/ui_select.wav",        //menuchoice made
     "assets/sounds/ui_back.wav"           //cancelled or not allowed
@@ -51,6 +53,7 @@ static void loadAll()
             sounds[i] = new sf::Sound();
             sounds[i]->setBuffer(*buffer);
             sounds[i]->setVolume(SFX_VOLUME);
+            if (i == SND_STEP) sounds[i]->setVolume(SFX_VOLUME * 0.6f);     //footsteps happen a lot, so they are quieter
         }
         else delete buffer;                //if file missing then stay silent
     }
@@ -60,7 +63,7 @@ static void playNow(int id)
 {
     if (!loaded) loadAll();
     if (id <= 0 || id >= TOTAL_SOUNDS || !sounds[id]) return;
-    if (id == SND_PLAYER_HIT || id == SND_PLAYER_HURT || id == SND_BLOCK) sounds[id]->setPitch(1.f + PITCH_VARIATION * ((rand() % 201) - 100) / 100.f);
+    if (id == SND_PLAYER_HIT || id == SND_PLAYER_HURT || id == SND_BLOCK || id == SND_STEP) sounds[id]->setPitch(1.f + PITCH_VARIATION * ((rand() % 201) - 100) / 100.f);
     sounds[id]->play();
 }
 

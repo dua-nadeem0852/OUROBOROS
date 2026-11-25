@@ -15,6 +15,8 @@ static const int ATK_WEIGHT[ENEMY_TYPE_COUNT] = {  90,   70,  52 };   //%
 
 static const int HP_PERCENT[3] = {   70,  105,  145 };     //     easy    normal   hard
 static const int ATK_PERCENT[3] = {   65,  105,  135 };      //     easy    normal   hard
+//NOTE: ATK_PERCENT STACKS on purpose with damageTakenPercent (Player.cpp, 75 / 100 / 150): both are applied to a boss hit,
+//so a boss hit is about 0.46x (easy) / 1x (normal) / 1.9x (hard) of the Normal damage.
 
 //boss that player is CURRENTLY fighting
 static int curType = ENEMY_NONE;
@@ -30,7 +32,6 @@ static int batCount = 0;   //how many extra bats are in the swarm
 static int headHP[HYDRA_HEADS];
 static int headMaxHP[HYDRA_HEADS];
 static bool headDefending[HYDRA_HEADS];
-static int headAction[HYDRA_HEADS];       //what each head decided to do this turn
 
 //defeated tracking
 static bool defeated[MAP_ROWS][MAP_COLS] = { { false } };  //by map tile so the map knows which boss tile is done
@@ -45,7 +46,6 @@ void createEnemy(int type)
     {
         headHP[i] = headMaxHP[i] = 0;
         headDefending[i] = false;
-        headAction[i] = HEAD_NONE;
     }
     if (type < 0 || type >= ENEMY_TYPE_COUNT) return;  //bad type, leave the enemy empty
 
@@ -188,8 +188,6 @@ int healHead(int head, int amount)
 
 void setHeadDefending(int h, bool on) { if (h >= 0 && h < HYDRA_HEADS) headDefending[h] = on; }
 bool isHeadDefending(int h) { return (h >= 0 && h < HYDRA_HEADS) ? headDefending[h] : false; }
-void setHeadAction(int h, int a) { if (h >= 0 && h < HYDRA_HEADS) headAction[h] = a; }
-int  getHeadAction(int h) { return (h >= 0 && h < HYDRA_HEADS) ? headAction[h] : HEAD_NONE; }
 
 //for tracking defeated enemies
 bool isEnemyDefeated(int row, int col)

@@ -1,3 +1,4 @@
+//AMINA AHMAD SYED 26L-0760 member 1
 //Screens.cpp ------ menu, hud, bag, story box, pause, game over and credits (drawing only)
 //WHAT THIS FILE DOES: draws every screen that is not the map or the battle. it never changes
 //the game, Game.cpp decides which screen to show and handles the keys
@@ -7,7 +8,6 @@
 #include "Story.h"
 #include "PlayerInterface.h"
 #include <algorithm>
-#include <cmath>
 #include <utility>
 
 static std::string difficultyName(int d)
@@ -20,9 +20,8 @@ static std::string difficultyName(int d)
 //a dark trasparent/seethrough layer so the thing behind it is still visible but like dimmer
 static void dimScreen(sf::RenderWindow& window, int alpha)
 {
-    sf::RectangleShape layer(sf::Vector2f((float)SCREEN_W, (float)SCREEN_H));    //using casting converting width into float 
-                                                                                 // as for vector position it only supports float values
-    layer.setFillColor(sf::Color(0, 0, 0, alpha));     // alpha shows how much dark each screen should be
+    sf::RectangleShape layer(sf::Vector2f((float)SCREEN_W, (float)SCREEN_H));
+    layer.setFillColor(sf::Color(0, 0, 0, alpha));
     window.draw(layer);
 }
 
@@ -31,14 +30,13 @@ void drawMainMenu(sf::RenderWindow& window, const sf::Font& font, int selected, 
     //SFML 2.6 does not decode MP4 files itself. The menu video is therefore
     //stored as numbered JPG frames in assets/backgrounds/bg_mainmenu/.
     //load the frames once, then display them in order to create a looping video.
-    static std::vector<sf::Texture> menuFrames;                   // iwth static it makes these variables tobe reuse again 
-                                                                    // menu is drawn 60 times per sec so it doesnt have to form that again and can use it again and again
-    static bool triedLoadingMenuFrames = false;                      
+    static std::vector<sf::Texture> menuFrames;
+    static bool triedLoadingMenuFrames = false;
     static sf::Clock menuVideoClock;
     const float MENU_VIDEO_FPS = 12.f;
 
     if (!triedLoadingMenuFrames)
-    {                                  //making sure that loading happens only one time......
+    {
         triedLoadingMenuFrames = true;
         for (int i = 0; i < 1000; i++)
         {
@@ -48,25 +46,25 @@ void drawMainMenu(sf::RenderWindow& window, const sf::Font& font, int selected, 
 
             sf::Texture frame;
             if (!frame.loadFromFile(filename)) break;  //stop at the first missing frame
-            frame.setSmooth(false);                   // turns off blurring to preserve the pixel-art look
-            menuFrames.push_back(std::move(frame));   // push back= adding images and move = handing over textures instead of copying it
+            frame.setSmooth(false);                   //preserve the pixel-art look
+            menuFrames.push_back(std::move(frame));
         }
     }
 
     if (!menuFrames.empty())
-    {             //to decide which frame is to be shown.....(time* fps % total frames of menu )= frame no thats to be displayed
+    {
         int frameIndex = (int)(menuVideoClock.getElapsedTime().asSeconds() * MENU_VIDEO_FPS)
                          % (int)menuFrames.size();
         sf::Texture& currentFrame = menuFrames[frameIndex];
         sf::Vector2u size = currentFrame.getSize();
         sf::Sprite videoFrame(currentFrame);
 
-        //scale equally to cover the full 1280x720 menu without stretching the image.
-        float scale = std::max((float)SCREEN_W / size.x, (float)SCREEN_H / size.y); //picking max out of both 
+        //scale to cover the full 1280x720 menu without stretching the image.
+        float scale = std::max((float)SCREEN_W / size.x, (float)SCREEN_H / size.y);
         videoFrame.setScale(scale, scale);
-        float width = size.x * scale;   // new width of image to enlarge them equally
+        float width = size.x * scale;
         float height = size.y * scale;
-        videoFrame.setPosition((SCREEN_W - width) / 2.f, (SCREEN_H - height) / 2.f);  // answer pixels will be cut off from the image during enlarging
+        videoFrame.setPosition((SCREEN_W - width) / 2.f, (SCREEN_H - height) / 2.f);
         window.draw(videoFrame);
     }
     else
@@ -102,13 +100,12 @@ void drawMainMenu(sf::RenderWindow& window, const sf::Font& font, int selected, 
     lines[4] = "Credits";
     lines[5] = "Exit";
 
-    //to change color of selected option and put an arrow to show it
-    for (int i = 0; i < 6; i++)   
+    for (int i = 0; i < 6; i++)
     {
         sf::Color color = (i == selected) ? GOLD : TEXT_COLOR;
-        if (i == 1 && !canContinue) color = DIM_COLOR;          //grey out if savexists is false like no  file is saved
+        if (i == 1 && !canContinue) color = DIM_COLOR;
         std::string text = (i == selected) ? ">  " + lines[i] : lines[i];
-        drawText(window, font, text, 24, 62.f, 235.f + i * 54.f, color);   //235.f + i * 54.f   for spacing btw them almost 54 pixels
+        drawText(window, font, text, 24, 62.f, 235.f + i * 54.f, color);
     }
 
     drawText(window, font, "High score: " + std::to_string(highScore), 18, 62.f, 590.f, GOLD);
@@ -119,18 +116,18 @@ void drawMainMenu(sf::RenderWindow& window, const sf::Font& font, int selected, 
 
 void drawHud(sf::RenderWindow& window, const sf::Font& font, const std::string& message)
 {
-    float x = 690.f;  // to make panel on the right of menu
+    float x = 690.f;
     drawPanel(window, x, 40.f, 566.f, 640.f);
 
     drawText(window, font, getPlayerName(), 28, x + 24.f, 56.f, GOLD);
     drawText(window, font, difficultyName(getDifficulty()), 16, x + 460.f, 66.f, DIM_COLOR);
 
     drawText(window, font, "HP  " + std::to_string(getPlayerHP()) + " / " + std::to_string(getPlayerMaxHP()), 20, x + 24.f, 110.f);
-    drawBar(window, x + 24.f, 142.f, 518.f, 16.f, getPlayerHP(), getPlayerMaxHP(), sf::Color(70, 190, 90));  //greeen color  , it fills by fraction current/max
+    drawBar(window, x + 24.f, 142.f, 518.f, 16.f, getPlayerHP(), getPlayerMaxHP(), sf::Color(70, 190, 90));
 
     drawText(window, font, "Level " + std::to_string(getPlayerLevel()) + "     Attack level " + std::to_string(getplayerAtkLevel()) + " / " + std::to_string(getPlayerMaxAttackLevel()), 20, x + 24.f, 180.f);
     drawText(window, font, "EXP  " + std::to_string(getPlayerExp()) + " / " + std::to_string(getExpNeededForNextLevel()), 18, x + 24.f, 220.f, DIM_COLOR);
-    drawBar(window, x + 24.f, 250.f, 518.f, 10.f, getPlayerExp(), getExpNeededForNextLevel(), sf::Color(90, 140, 230));  //blue bar
+    drawBar(window, x + 24.f, 250.f, 518.f, 10.f, getPlayerExp(), getExpNeededForNextLevel(), sf::Color(90, 140, 230));
 
     //both keys are shown as just "Key" so the player can't tell the real one apart
     int keys = getItemCount(ITEM_REAL_KEY) + getItemCount(ITEM_DECOY_KEY);
@@ -152,7 +149,7 @@ void drawHud(sf::RenderWindow& window, const sf::Font& font, const std::string& 
 
 void drawInventory(sf::RenderWindow& window, const sf::Font& font, int selected, const std::string& notice)
 {
-    dimScreen(window, 200);                                       //it dims the game and then draw panel for it
+    dimScreen(window, 200);
     drawPanel(window, 140.f, 70.f, 1000.f, 580.f);
     drawText(window, font, "Bag", 32, 170.f, 86.f, GOLD);
     drawText(window, font, "HP " + std::to_string(getPlayerHP()) + " / " + std::to_string(getPlayerMaxHP()), 20, 900.f, 96.f);
@@ -160,12 +157,12 @@ void drawInventory(sf::RenderWindow& window, const sf::Font& font, int selected,
     //8 slots. 4 in a row
     for (int i = 0; i < INVENTORY_SLOTS; i++)
     {
-        float sx = 170.f + (i % 4) * 235.f;    // it will give columns
-        float sy = 150.f + (i / 4) * 130.f;    // it will give rows
+        float sx = 170.f + (i % 4) * 235.f;
+        float sy = 150.f + (i / 4) * 130.f;
         drawPanel(window, sx, sy, 215.f, 110.f);
 
         int id = getSlotItemId(i);
-        if (id < 0)    //empty slot
+        if (id < 0)
         {
             drawText(window, font, "empty", 18, sx + 16.f, sy + 40.f, DIM_COLOR);
         }
@@ -200,7 +197,7 @@ void drawInventory(sf::RenderWindow& window, const sf::Font& font, int selected,
     drawText(window, font, notice, 20, 170.f, 560.f, GOLD);
     drawText(window, font, "Arrows: move     Enter: use     S: sort A-Z     Esc or I: close", 16, 170.f, 610.f, DIM_COLOR);
 }
-//the dialogue box....... used for relics, intro , end
+
 void drawTextScene(sf::RenderWindow& window, const sf::Font& font, const std::string& title, const std::string& text)
 {
     dimScreen(window, 150);
@@ -227,21 +224,19 @@ void drawPauseMenu(sf::RenderWindow& window, const sf::Font& font, const std::st
 void drawGameOver(sf::RenderWindow& window, const sf::Font& font)
 {
     dimScreen(window, 230);
-    drawCenteredText(window, font, "GAME OVER", 80, SCREEN_W / 2.f, 230.f, sf::Color(200, 70, 70));  // red color
-    drawCenteredText(window, font, "Viktor falls, and the mist closes over him.", 22, SCREEN_W / 2.f, 350.f); //story line 
+    drawCenteredText(window, font, "GAME OVER", 80, SCREEN_W / 2.f, 230.f, sf::Color(200, 70, 70));
+    drawCenteredText(window, font, "Viktor falls, and the mist closes over him.", 22, SCREEN_W / 2.f, 350.f);
     drawCenteredText(window, font, "Press Enter to return to the main menu", 18, SCREEN_W / 2.f, 440.f, DIM_COLOR);
 }
 
-bool drawCredits(sf::RenderWindow& window, const sf::Font& font, float scroll)  //scroll is a float number that game.cpp increases during every frame 
+bool drawCredits(sf::RenderWindow& window, const sf::Font& font, float scroll)
 {
     int count = getCreditsLineCount();
     for (int i = 0; i < count; i++)
     {
         float y = SCREEN_H - scroll + i * 44.f;
-        if (y < -40.f || y > SCREEN_H)
-        { continue;}       //if line is above screen height then ignore it and continue 
-        
-        unsigned size = (i == 0) ? 56 : 24;  // for first line which is title so it would be bigger else would be normal
+        if (y < -40.f || y > SCREEN_H) continue;       //off screen. don't bother
+        unsigned size = (i == 0) ? 56 : 24;
         sf::Color color = (i == 0) ? GOLD : TEXT_COLOR;
         drawCenteredText(window, font, getCreditsLine(i), size, SCREEN_W / 2.f, y, color);
     }
@@ -249,7 +244,5 @@ bool drawCredits(sf::RenderWindow& window, const sf::Font& font, float scroll)  
 
     //done when the last line has gone past the top
     float lastY = SCREEN_H - scroll + (count - 1) * 44.f;
-
-    return lastY < -40.f;  // it will check whether last line has passed the top of screen n if yes then
-                            // it returns true that the credits are displayed completely so u can go back to menu
+    return lastY < -40.f;
 }

@@ -1,10 +1,11 @@
+//AMINA AHMAD SYED 26L-0760 member 1
 // Map.cpp - It contains the map, the player's position and whatever is on every tile (Amina's part)
 // WHAT THIS FILE DOES: It is a 10x10 map, moves the player (walls block you), decides what
 // happens on every tile (traps, holes, bushes, relics, keys, npcs, clues, bosses, the chest),
 // makes the map a bit harder/easier depending on the difficulty, saves/loads the map state
 // and draws the map. 
 // the layout is the same one Amina made, only the extra E tiles were taken out
-// (there are only 3 bosses so only 3 enemy tiles are needed, see the map below)
+// (only the Scientist and the Bat stand on E tiles, see the map below. the Hydra has no tile, it is fought at the chest)
 
 #include "Map.h"
 #include "UiDraw.h"
@@ -15,10 +16,10 @@
 
 const int START_ROW= 4;     //player begins in the middle
 const int START_COL = 4;
-const int TRAP_DAMAGE = 10;    //takeDamage() makes it bigger on hard
+const int TRAP_DAMAGE = 10;    //takeDamage() scales it by difficulty (less on easy, more on hard)
 const int HOLE_DAMAGE = 15;
 
-// the map each string is one row
+// the map. each string is one row
 static const char* START_MAP[MAP_SIZE] = {
     ".T.B..B...",
     "......T.E.",
@@ -35,14 +36,14 @@ static const char* START_MAP[MAP_SIZE] = {
 //   W = wall (cannot walk through)   N = npc (press E to talk)   ? = clue (press E to read)
 // they are put on the map in initializeMap() so START_MAP above stays exactly what Amina made.
 
-static const int WALL_COUNT = 8;  // a total of 8 walls
-static const int WALL_ROW[WALL_COUNT] = { 1, 1, 3, 3, 6, 7, 7, 8 };   // specifying the coordinates for where the wall will be
+static const int WALL_COUNT = 8;
+static const int WALL_ROW[WALL_COUNT] = { 1, 1, 3, 3, 6, 7, 7, 8 };
 static const int WALL_COL[WALL_COUNT] = { 2, 3, 8, 9, 8, 7, 8, 6 };
 
 static const int NPC_COUNT = 2;
 static const int NPC_ROW[NPC_COUNT] = { 4, 6 };
 static const int NPC_COL[NPC_COUNT] = { 2, 1 };
-static const char* NPC_TEXT[NPC_COUNT] = {   // const char* has been used as we are storing text not a number
+static const char* NPC_TEXT[NPC_COUNT] = {
     "A lost traveller whispers: \"Not every key is what it looks like. Ask the thing at the very end.\"",
     "A hooded figure says: \"Three guard this place. The last one carries the only key that matters.\""
 };
@@ -53,7 +54,7 @@ static const int CLUE_COL[CLUE_COUNT] = { 5, 3, 8 };
 static const char* CLUE_TEXT[CLUE_COUNT] = {
     "Scratched into the stone: \"The first key you are given is a lie.\"",
     "A faded note: \"Holes send you home. Watch where you step in the south.\"",
-    "Carved words: \"A chest waits in the far east. It only shows itself to someone carrying a key.\""""
+    "Carved words: \"A chest waits in the far east. It only shows itself to someone carrying a key.\""
 };
 
 // difficulty changes the traps: hard gets extra ones, easy loses a couple
@@ -74,8 +75,8 @@ static const int RELIC_TILE_ROW[RELIC_TILE_COUNT]   = { 2, 2, 3, 3, 5, 8, 8 };
 static const int RELIC_TILE_COL[RELIC_TILE_COUNT]   = { 4, 7, 1, 6, 7, 4, 9 };
 static const int RELIC_TILE_STORY[RELIC_TILE_COUNT] = { 0, 3, 1, 4, 2, 5, 6 };
 
-// the three bosses and their positioning
-// (row, col, which boss). scientist is the closest one to the start, hydra is the last (appears once you have defeated the previous 2 bosses)
+// the three bosses and where they stand
+// (row, col, which boss). the scientist is the closest one to the start, the bat the furthest
 static const int BOSS_COUNT = 3;
 // the hydra's "position" is the chest, because that is where you fight it
 static const int BOSS_ROW[BOSS_COUNT]  = { 2, 1, CHEST_ROW };
@@ -95,14 +96,14 @@ static Tile gameMap[MAP_SIZE][MAP_SIZE];
 static int  playerRow = START_ROW;
 static int  playerCol = START_COL;
 static int  relicsFound = 0;
-static int  lastRelicStory = -1;     // which story the last relic picked up has, -1 is used to show no signal
+static int  lastRelicStory = -1;     // which story the last relic picked up has
 static std::string message = "";
 
 void initializeMap()
 {
-    for (int r = 0; r < MAP_SIZE; r++) //rows
+    for (int r = 0; r < MAP_SIZE; r++)
     {
-        for (int c = 0; c < MAP_SIZE; c++) // cols
+        for (int c = 0; c < MAP_SIZE; c++)
         {
             gameMap[r][c].type = START_MAP[r][c];
             gameMap[r][c].revealed = false;
@@ -156,7 +157,7 @@ bool movePlayer(int rowChange, int colChange)
         return false;
     }
 
-    // initially there was nothing that could block the player before. walls do now
+    // walls block the way
     if (gameMap[newRow][newCol].type == 'W')
     {
         message = "A wall blocks the way.";
@@ -171,23 +172,6 @@ bool movePlayer(int rowChange, int colChange)
     return true;
 }
 
-char getTileType(int row, int col)
-{
-    if (!checkBoundaries(row, col)) return '#';
-    return gameMap[row][col].type;
-}
-
-// outside the map we hand back a blank wall tile so callers never read out of the array
-const Tile& getTile(int row, int col)
-{
-    static const Tile outside = { '#', false, false, true, false };
-    if (!checkBoundaries(row, col)) return outside;
-    return gameMap[row][col];
-}
-
-bool isTileTriggered(int row, int col) { return checkBoundaries(row, col) && gameMap[row][col].triggered; }
-
-bool isRevealed(int row, int col) { return checkBoundaries(row, col) && gameMap[row][col].revealed; }
 int  getPlayerRow() { return playerRow; }
 int  getPlayerCol() { return playerCol; }
 std::string getMapMessage() { return message; }
@@ -259,7 +243,8 @@ int stepOnTile()
         return RESULT_ENEMY;
     }
 
-    // traps and holes are hidden: they look like plain floor until they go off.
+    // traps and holes are hidden: they look like plain floor until they go off. (this is on purpose: it symbolises
+    // Viktor's deteriorating mental state, he cannot trust what he sees until the danger has already hit him)
     // after that the tile is marked as triggered and shows its picture for the rest of the game
     if (tile == 'T')
     {
@@ -343,7 +328,6 @@ int interactWithTile()
         return RESULT_ITEM;
     }
 
-
     if (tile == 'N')
     {
         // the npc says something different depending on which one it is
@@ -370,7 +354,7 @@ static void drawLetterTile(sf::RenderWindow& window, const sf::Font& font, float
                            const char* letter, sf::Color fill)
 {
     sf::RectangleShape box(sf::Vector2f(TILE_SIZE - 6.f, TILE_SIZE - 6.f));
-    box.setPosition(x + 3.f, y + 3.f);   //centering 
+    box.setPosition(x + 3.f, y + 3.f);
     box.setFillColor(fill);
     window.draw(box);
     drawCenteredText(window, font, letter, 28, x + TILE_SIZE / 2.f, y + 14.f, sf::Color(240, 235, 220));
@@ -614,36 +598,4 @@ bool loadMapState(const std::string& filename)
         if (beaten[i] == 1) { markBossTypeDefeated(BOSS_TYPE[i]); markEnemyDefeated(BOSS_ROW[i], BOSS_COL[i]); }
     syncEnemyFlags();
     return true;
-}
-
-// true if every tile you need (relics, key, bushes, bosses, chest) can be reached from the start
-// without going through walls or holes, so the walls can never lock the game
-bool everythingReachable()
-{
-    bool seen[MAP_SIZE][MAP_SIZE];
-    for (int r = 0; r < MAP_SIZE; r++) for (int c = 0; c < MAP_SIZE; c++) seen[r][c] = false;
-
-    int queueR[MAP_SIZE * MAP_SIZE], queueC[MAP_SIZE * MAP_SIZE];
-    int head = 0, tail = 0;
-    queueR[tail] = START_ROW; queueC[tail++] = START_COL; seen[START_ROW][START_COL] = true;
-
-    int dr[4] = { -1, 1, 0, 0 }, dc[4] = { 0, 0, -1, 1 };
-    while (head < tail)
-    {
-        int r = queueR[head], c = queueC[head++];
-        for (int d = 0; d < 4; d++)
-        {
-            int nr = r + dr[d], nc = c + dc[d];
-            if (!checkBoundaries(nr, nc) || seen[nr][nc]) continue;
-            if (gameMap[nr][nc].type == 'W' || gameMap[nr][nc].type == 'H') continue;
-            seen[nr][nc] = true;
-            queueR[tail] = nr; queueC[tail++] = nc;
-        }
-    }
-
-    for (int r = 0; r < MAP_SIZE; r++)
-        for (int c = 0; c < MAP_SIZE; c++)
-            if (std::string("BRNE?").find(gameMap[r][c].type) != std::string::npos && !seen[r][c])
-                return false;
-    return seen[CHEST_ROW][CHEST_COL];
 }

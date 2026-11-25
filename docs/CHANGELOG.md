@@ -1,6 +1,23 @@
 # Changelog (development notes)
 
-Older entries mention the flat folder layout. Files are now in `src/`, `scripts/` and `assets/` (see the README).
+Older entries describe the game as it was at that time (flat folder layout, key rewards, boss tile positions). Files are now in `src/`, `scripts/` and `assets/` (see the README), and the code and the README are the current truth.
+
+## Final cleanup round
+
+- **Boss health bars and marks fade with the boss.** After a victory the boss fades out over 1.3 s. The Hydra's red X marks, flash, ring and guard ring, the head HP bars and numbers, and the whole boss panel (top left) now fade with it instead of staying solid (`bossFade()` in `BattleScreen.cpp`). `drawBar` and `drawPanel` got an optional `fade` argument (default 1, so other screens are unchanged).
+- **Bug fix: damage numbers on Easy and Hard.** The battle log and the floating numbers showed the hit *before* the difficulty % was applied (a bite shown as 10 cost 15 HP on Hard). They now show the HP really lost (`hitPlayer` and `tickCurse` in `Battle.cpp`). The curse text and the `Cursed: -N/turn` line also include the difficulty. New `damageAfterDifficulty()` in `Player.cpp` is the one place that does the maths (`takeDamage` uses it too). The unused second column of the old difficulty table was removed.
+- Difficulty is now documented as one design: boss HP%, boss attack% and damage taken% stack on purpose (comments at both tables; Hard boss hits are about 1.9x Normal, Easy about 0.46x). The score multiplier is now a table (`SCORE_PERCENT` in `Game.cpp`) like the others instead of an `if` chain.
+- Every file now starts with its owner's name and roll number (Amina: Map, Screens, Story; Zarnib: Player, PlayerInterface, SaveSystem; Dua: Battle, Enemy, BattleScreen, BattleSound, UiDraw), as in the proposal.
+- Audit fixes: the poison potion text no longer says a fixed 15 HP (the real cost depends on the difficulty); comments that were wrong were corrected (the Map file said 3 enemy tiles but there are 2, `getTotalItems` does not use recursion, nothing calls `healPlayer()` with no amount, saving happens only from the pause menu, the buff covers 2 attacks, the round counter also counts the boss's answer, call graph in `CODE_GUIDE.md`). The README and `Map.cpp` now say that traps and holes are hidden on purpose, as a symbol of Viktor's deteriorating mental state.
+- Docs and comments: removed stray typing marks, wrong or outdated notes (menu music is `menu.wav`, the Story/Map relic comments, the `PlayerInterface.h` header, history notes in `SaveSystem`), and documented that the buff potion also raises the attack level for good.
+
+## Battle polish round
+
+- Battle text boxes: bigger text (size 22, up to 4 lines); words about HP (the word HP, damage/heal numbers) are red (`hpWordFlags` in `Battle.cpp`, drawn by `drawTextBox` in `BattleScreen.cpp`).
+- Short pause before the boss answers (`ENEMY_TURN_DELAY` in `BattleScreen.cpp`). `Battle.cpp` has `setEnemyTurnDelay`, `isEnemyTurnPending`, `runPendingEnemyTurn`; the delay is off by default (the battle screen turns it on).
+- When Viktor is hurt his sprite shakes harder and turns red for half a second.
+- New sounds: `defend.wav` (`SND_DEFEND`) and `step.wav` (`SND_STEP`, played from `Game.cpp` on every step).
+- `build_game.bat` builds with `-mwindows` and starts the game with `start`, so no terminal stays open.
 
 ## First merged version
 
@@ -23,22 +40,22 @@ Map notes for Amina:
 - keys follow the proposal: the key tile, the Mad Scientist and the Bat give fake keys, only the Hydra (final boss) gives the real key, and only the real key opens the chest
 
 ## Added in the latest round
-- `SaveSystem.h/.cpp` (from the File Handling add-on, fixed): save/load =  player stat save + the map state (`save.txt` and `save.txt.map`), plus the high score (`highscores.txt`). Add-on fixes: missing `#include <string>`, it called functions Player.cpp doesn't have, and it didn't save the level....z
-- Map: walls `#`, NPCs `N`, clues `?`, extra traps on Hard / fewer on Easy, `everythingReachable()` check so walls can't lock the game, `saveMapState/loadMapState`.
+- `SaveSystem.h/.cpp` (from the File Handling add-on, fixed): save/load =  player stat save + the map state (`save.txt` and `save.txt.map`), plus the high score (`highscores.txt`). Add-on fixes: missing `#include <string>`, it called functions Player.cpp doesn't have, and it didn't save the level.
+- Map: walls `W`, NPCs `N`, clues `?`, extra traps on Hard / fewer on Easy, `saveMapState/loadMapState`.
 - Game: Continue in the menu, Save (S) in the pause menu, score + high score, level-up message, resizable window that scales to any screen (black bars if the shape differs), Fullscreen/Windowed in the menu and with F11.
 - Boss hit sounds: `SND_SCIENTIST_HIT`, `SND_BAT_HIT`, `SND_HYDRA_HIT` play when that boss gets hurt (right after the sword hit sound). Files: `assets/sounds/scientist_hit.wav`, `bat_hit.wav`, `hydra_hit.wav` (placeholder sounds, replace with real ones).
-- Bug fix in `Player.cpp`: a save slot with item -1 but count > 0 (or an item with count 0) is now rejected on load.........///z
+- Bug fix in `Player.cpp`: a save slot with item -1 but count > 0 (or an item with count 0) is now rejected on load.
 - Every file now starts with a comment saying what it does.
 
 ## Still not done
-- relic journal in the bag, optional extra enemies, real art/audio credits, real sound/music files instead of placeholders
+- relic journal in the bag, optional extra enemies (the credits were filled in later, see Round 4)
 
 ## Round 3 (changes from the "TO FIX" PDF + PF concepts)
 - **Tile struct** (`Map.h/.cpp`): the map is now `Tile gameMap[10][10]` (type, visited, enemyDefeated, revealed, triggered) instead of 3 separate arrays.
-- **Item struct + bubble sort** (`Player.cpp`): a bag slot is an `Item {id, name, quantity}`; `sortInventory()` bubble-sorts the bag A-Z by name (empty slots last). Press **S** in the bag. Also fixed `saveGameBinary`, which would have written the raw struct (a string pointer) once slots became structs....z
+- **Item struct + bubble sort** (`Player.cpp`): a bag slot is an `Item {id, name, quantity}`; `sortInventory()` bubble-sorts the bag A-Z by name (empty slots last). Press **S** in the bag. Also fixed `saveGameBinary`, which would have written the raw struct (a string pointer) once slots became structs.
 - **Chest/hydra** (`Map.cpp`, `Game.cpp`): the chest is invisible and not interactable until the Bat's decoy key is in the bag. The Hydra no longer stands on the map at 9,6: pressing E on the chest shows the dialogue, then the fight starts (it never starts by walking onto the chest). The chest is at 5,8. Stale clue text fixed ("the first key you are given is a lie", chest in the far east).
 - **Hidden traps and holes**: they look like plain floor until they go off, then their picture stays on the map. A sprung trap does not hurt again. Saved in the map save file (older saves still load).
-- **Music**: `playMusicTrack()` in `BattleSound.cpp`. `assets/music/menu.wav` plays in the menu/credits, `assets/music/explore.wav` while exploring; battle music is unchanged. Drop in `menu.ogg` / `explore.ogg` to replace the placeholders (.ogg is tried first).
+- **Music**: `playMusicTrack()` in `BattleSound.cpp`. `assets/music/menu.wav` plays in the menu/credits, `assets/music/explore.ogg` while exploring; battle music is unchanged. Drop in `menu.ogg` / `explore.ogg` to replace the placeholders (.ogg is tried first).
 - **Textures**: `assets/images/floor.png`, `wall.png`, `npc.png`, `clue.png`, `relic.png`, `relic_bag.png` are used if present (coloured squares otherwise). The ones here are placeholders, replace them with your real art using the same names.
 - **Relic bag**: all relics are one bag item ("Relic Bag x3") with its own picture in the inventory.
 - The old `.exe` files were removed because they were built from the old code. Run `scripts\build_game.bat`.

@@ -1,6 +1,5 @@
 //DUA NADEEM 26L-0852 member 3
 //BattleScreen.h - WHAT THIS FILE DOES: the functions Game.cpp calls to show and control the battle screen
-//the first person battle screen
 #ifndef BATTLE_SCREEN_H
 #define BATTLE_SCREEN_H
 #include <SFML/Graphics.hpp>

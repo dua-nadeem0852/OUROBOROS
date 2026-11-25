@@ -3,7 +3,6 @@
 // runs the main loop, switches between the game states, handles the keys, keeps the score and
 //connects the save system. the actual rules live in the other files (Map, Battle, Player etc)
 //the loop does 3 things every frame: read the keys, draw whatever state we are in, show it
-//the actual rules live in the other files as mentioned before, this file only connects them
 #include "Game.h"
 #include "Map.h"
 #include "Screens.h"
@@ -61,6 +60,9 @@ static void saveUnlocked()
     out << (hardUnlocked ? 1 : 0);
 }
 
+//score multiplier (%) by difficulty, a table like the other difficulty tables:   easy  normal  hard
+static const int SCORE_PERCENT[3] = { 100, 150, 200 };
+
 //finishing the game gives a big bonus and the harder the difficulty the bigger the total
 static int computeScore(bool wonGame)
 {
@@ -71,10 +73,9 @@ static int computeScore(bool wonGame)
     score += getPlayerHP() * 2;
     if (wonGame) score += 1000;
 
-    int percent = 150;                                   //normal
-    if (getDifficulty() == DIFF_EASY) percent = 100;
-    if (getDifficulty() == DIFF_HARD) percent = 200;
-    return score * percent / 100;
+    int diff = getDifficulty();
+    if (diff < 0 || diff > 2) diff = DIFF_NORMAL;
+    return score * SCORE_PERCENT[diff] / 100;
 }
 
 //changing state
@@ -253,7 +254,7 @@ static void createWindow(sf::RenderWindow& window)
     }
     else
     {
-        //i set it to 16:9 because most like 90% of the desktop so it also fits small laptop screens
+        //the window is SCREEN_W x SCREEN_H (16:9), shrunk (same shape) so it takes at most 90% of the desktop, so it also fits small laptop screens
         float w = (float)SCREEN_W;
         float h = (float)SCREEN_H;
         float scale = 1.f;
@@ -345,7 +346,11 @@ static void exploreKey(sf::Keyboard::Key key)
     if (rowChange != 0 || colChange != 0)
     {
         battleNote = "";
-        if (movePlayer(rowChange, colChange)) handleMapResult(stepOnTile());
+        if (movePlayer(rowChange, colChange))
+        {
+            playEffect(SND_STEP);              //footstep. only when we really moved (a wall gives no step)
+            handleMapResult(stepOnTile());
+        }
     }
     else if (key == sf::Keyboard::E)
     {

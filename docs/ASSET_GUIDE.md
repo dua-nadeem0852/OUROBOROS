@@ -73,7 +73,7 @@ If you change a story in `src/Story.cpp`, change its picture too.
 | `backgrounds/battle_0.png` / `battle_1.png` / `battle_2.png` | Scientist / Bat / Hydra background | OK |
 | `backgrounds/battle.png` | one shared background for any boss without its own | optional, not needed |
 
-- Backgrounds: about 16:9 (the ones here are 1942x809). The battle screen adapts to any window shape.
+- Backgrounds: about 2.4:1 (the ones here are about 1942x809). The battle screen adapts to any window shape.
 - Not used by the code (leftovers): `sprites/wizard.png`, `sprites/viktor_64x64_original.png`.
 - Pixel-art look for the bosses: set `SMOOTH_BOSS_SPRITES = false` in `src/BattleScreen.cpp`.
 
@@ -93,12 +93,13 @@ SFML can't play mp4, so the menu "video" is a folder of numbered pictures shown 
 
 | File | Plays when | Status |
 |---|---|---|
-| `menu.ogg` | main menu and credits | OK |
+| `menu.wav` | main menu and credits | OK |
 | `explore.ogg` | walking around, bag, story boxes | OK |
 | `battle_2.ogg` | Hydra fight | OK |
 | `battle_0.ogg` | Scientist fight | OK |
 | `battle_1.ogg` | Bat fight | OK |
 
+- The game tries `.ogg` first, then `.wav`, then `.flac` for every track.
 - Music loops. The game over screen is silent on purpose. After a fight the exploration song comes back by itself.
 - Volume: `MUSIC_VOLUME` (0-100) at the top of `src/BattleSound.cpp`.
 
@@ -106,7 +107,7 @@ SFML can't play mp4, so the menu "video" is a folder of numbered pictures shown 
 
 ## 5. Sound effects - `assets/sounds/`
 
-Short `.wav` files (0.1-2 s). The names are fixed by the table at the top of `src/BattleSound.cpp`.
+Short `.wav` files (mostly under 2 s; the longest are `laugh.wav` and `wail.wav`). The names are fixed by the table at the top of `src/BattleSound.cpp`.
 
 | File | Plays when | Status |
 |---|---|---|
@@ -121,6 +122,8 @@ Short `.wav` files (0.1-2 s). The names are fixed by the table at the top of `sr
 | `victory.wav` | boss defeated | OK |
 | `defeat.wav` | player defeated (in a fight, or killed by a trap / hole) | OK |
 | `scientist_hit.wav` / `bat_hit.wav` / `hydra_hit.wav` | that boss gets hurt (right after `hit.wav`) | OK |
+| `defend.wav` | Viktor braces (Defend) | OK |
+| `step.wav` | one footstep when Viktor walks in explore mode (played by `Game.cpp`, quiet, pitch varies a little) | OK |
 | `ui_move.wav` | cursor / selection moved | OK |
 | `ui_select.wav` | something chosen | OK |
 | `ui_back.wav` | cancelled, or "not allowed" | OK |
@@ -129,7 +132,7 @@ Volume: `SFX_VOLUME` at the top of `src/BattleSound.cpp`.
 
 **Potion sounds.** Healing works in a fight **and** in the bag (`heal.wav` both times). The buff and poison potions are **fights only**:
 in the bag they show "Better to save this one for a fight" and play `ui_back.wav`. In a fight the buff plays `buff.wav` and the poison plays `hurt.wav`
-(the battle log says "You lose 15 HP" and the damage number shows).
+(the battle log says how much HP you lost: 15 on Normal, more on Hard, and the damage number shows).
 
 **UI sounds** (`ui_move`, `ui_select`, `ui_back`) play in the battle screen **and** in `src/Game.cpp`:
 

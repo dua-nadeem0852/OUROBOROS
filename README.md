@@ -17,7 +17,7 @@ Programming Fundamentals project, **Group 8** . (FAST NUCES-2026)
 1. Install **MinGW-w64** (g++ and windres, default folder `C:\mingw64`) and **SFML 2.6.2 for MinGW** (default folder `C:\SFML-2.6.2`).
    Use the matching builds: GCC 13.1.0, 64-bit, SEH (both are linked from the SFML download page).
    If yours are somewhere else, set the `MINGW` and `SFML` environment variables or edit the top of `scripts\build_game.bat`.
-2. Clone the repo and double-click **`scripts\build_game.bat`** (or run it from the project root in PowerShell: `.\scripts\build_game.bat`).
+2. Clone the repo and double-click **`scripts\build_game.bat`** (the game opens without a terminal window; remove `-mwindows` in that file if you want the console back) (or run it from the project root in PowerShell: `.\scripts\build_game.bat`).
    It copies the DLLs next to the exe, builds the icon and the game, and starts it.
 
 The game must be started from the **project root** (the folder that contains `assets/`), the build script already does this.
@@ -48,12 +48,12 @@ If the submitted ZIP already contains `ouroboros.exe` and the DLLs, just double-
 
 ## Features
 
-- Fog of war map with hidden traps and holes, bushes with potions, walls, NPCs and clue tiles
+- Fog of war map with hidden traps and holes, bushes with potions, walls, NPCs and clue tiles. The traps and holes are invisible at first (they look like plain floor until they go off) to symbolise Viktor's deteriorating mental state: he cannot trust what he sees
 - 7 relics, each with its own picture and story
 - 3 boss battles (Mad Scientist, Humanoid Bat, Hydra) with their own music and sounds
 - Inventory with potions and keys, sortable with a bubble sort
-- Potions: healing works anywhere (fight or bag); buff (+50% damage for 3 rounds) and poison (-15 HP) are for fights only
-- 3 difficulties (Hard unlocks after beating the game on Normal)
+- Potions: healing (+40 HP) works anywhere (fight or bag); the buff (+1 attack level for good, max 3, and +50% damage for the round you drink it plus the next 2 attacks) and poison (-15 HP on Normal, more on Hard) are for fights only
+- 3 difficulties (Hard unlocks after beating the game on Normal). They change boss HP and attack, the damage you take, the number of traps and the final score. Boss attack and damage taken stack on purpose: a boss hit is about 0.5x as strong on Easy and 1.9x on Hard compared with Normal
 - Save / Continue, score and high score
 - Menu, exploration and battle music, UI sounds
 

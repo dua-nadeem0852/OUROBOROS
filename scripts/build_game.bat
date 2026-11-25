@@ -29,7 +29,9 @@ if errorlevel 1 (
     exit /b 1
 )
 
-g++ src/main.cpp src/Game.cpp src/Map.cpp src/Screens.cpp src/Story.cpp src/BattleScreen.cpp src/BattleSound.cpp src/UiDraw.cpp src/Battle.cpp src/Enemy.cpp src/Player.cpp src/SaveSystem.cpp ouroboros_res.o -o ouroboros -I src -I "%SFML%\include" -L "%SFML%\lib" -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+rem -mwindows = build the exe as a window program, so no black terminal opens behind the game.
+rem Delete it if you want the terminal back (the cout error messages only show there).
+g++ src/main.cpp src/Game.cpp src/Map.cpp src/Screens.cpp src/Story.cpp src/BattleScreen.cpp src/BattleSound.cpp src/UiDraw.cpp src/Battle.cpp src/Enemy.cpp src/Player.cpp src/SaveSystem.cpp ouroboros_res.o -o ouroboros -I src -I "%SFML%\include" -L "%SFML%\lib" -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -mwindows
 if errorlevel 1 (
     echo.
     echo Build FAILED - read the errors above.
@@ -37,7 +39,5 @@ if errorlevel 1 (
     exit /b 1
 )
 echo Build OK - starting the game...
-ouroboros.exe
-echo.
-echo The game closed (exit code %errorlevel%).
-pause
+rem "start" opens the game on its own, so this window closes and no terminal stays behind
+start "" ouroboros.exe

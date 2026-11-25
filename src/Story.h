@@ -1,5 +1,6 @@
+//AMINA AHMAD SYED 26L-0760 member 1
 //Story.h : all the story text in one place
-//the lines in Story.cpp are only a first draft, are subjected to change maybe 
+//the text itself is in Story.cpp
 #ifndef STORY_H
 #define STORY_H
 #include <string>

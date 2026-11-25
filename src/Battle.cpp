@@ -4,12 +4,13 @@
 #include "Enemy.h"
 #include "PlayerInterface.h"
 #include <cstdlib>
+#include <cctype>
 
-//might chnage these numbers in the future!
+//tuning numbers for the fights
 
 //buff potion (used in battle)
 static const int BUFF_PERCENT = 150;      //plus 50% extra dmg
-static const int BUFF_TURNS = 3;        //said extra atk/dmg for these many rounds
+static const int BUFF_TURNS = 3;        //rounds the buff lasts. the round you drink it counts too (the boss answers and uses one up), so it covers your next 2 attacks
 
 //BOSS MECHANICS outside of the common atks (basically special mechanics)
 //mad scientist: i wanted to show him a little erratic so each turn rolls 0-99
@@ -55,6 +56,8 @@ static int roundCounterVal = 0; //goes up every time a round is really played. t
 static int lastDamageToEnemy = 0; 
 static int lastDamageToPlayer = 0;
 static int lastHitHead = -1;
+static bool delayEnemyTurn = false;     //the screen turns this on: the boss answers a moment AFTER the players move
+static bool enemyTurnPending = false;   //the player moved and the boss still has to answer
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -114,7 +117,6 @@ static bool playerAlive()
     return getPlayerHP() > 0;     //>< and other operators of the like already produce a bool so i didnt use an if structure for a cleaner code
 }
 
-
 //picks the sound the boss makes when IT gets hurt (depends on which boss we are fighting)
 static int bossHitSound()
 {
@@ -125,8 +127,8 @@ static int bossHitSound()
     return SND_NONE;
 }
 
-//player takes a hit, choosing "defend" would half it basicallt.
-static int hitPlayer(int dmg)    //returns dmg actually taken.
+//player takes a hit, choosing "defend" halves it.
+static int hitPlayer(int dmg)    //returns the HP the player really lost (what the log and the damage numbers show)
 {
     if (dmg < 1) dmg = 1;
     if (playerDefending)
@@ -134,10 +136,12 @@ static int hitPlayer(int dmg)    //returns dmg actually taken.
         dmg = dmg / 2;
         if (dmg < 1) dmg = 1;
     }
-    lastDamageToPlayer += dmg;       //+= because the hydra can hit more than once in one round
-    takeDamage(dmg);   //the difficulty % is applied inside takeDamage (Player.cpp)
+    int before = getPlayerHP();
+    takeDamage(dmg);   //the difficulty % is applied inside takeDamage (Player.cpp), so dmg is not always what gets lost
+    int lost = before - getPlayerHP();       //so the number shown is the HP really lost (same idea as hurtPlayer in Map.cpp)
+    lastDamageToPlayer += lost;       //+= because the hydra can hit more than once in one round
     addSound(playerDefending ? SND_BLOCK : SND_PLAYER_HURT);
-    return dmg;
+    return lost;
 }
 
 //little bit of text added to the log when defend halves the hit
@@ -176,6 +180,7 @@ bool beginBattle(int bossType, int row, int col)
     curseDamage= 0;
     hydraRound = 0;
     soundCount = 0;        //throw away any sounds left over from before
+    enemyTurnPending = false;
     clearLog();
 
     if (bossType == ENEMY_MAD_SCIENTIST)
@@ -228,7 +233,6 @@ void advanceIntro()
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------*/
 //player actions
 
-void setTargetHead(int head) { targetHead = head; }
 int  getTargetHead()  { return pickLivingHead(targetHead); }
 
 void cycleTargetHead(int direction)
@@ -274,6 +278,7 @@ void playerAtk()
 void defend()
 {
     playerDefending = true;  //turns off again after the enemys turn (see playerAction)
+    addSound(SND_DEFEND);
     addLog("You brace yourself. The next hits do half damage.");
 }
 
@@ -438,11 +443,13 @@ static void chooseHeadActions(int act[HYDRA_HEADS])
 static void tickCurse()
 {
     if (curseTurns <= 0 || !playerAlive()) return;
-    lastDamageToPlayer += curseDamage;
+    int before = getPlayerHP();
     takeDamage(curseDamage);
+    int lost = before - getPlayerHP();       //the HP really lost (difficulty included)
+    lastDamageToPlayer += lost;
     curseTurns--;
     addSound(SND_PLAYER_HURT);
-    addLog("The curse gnaws at you for " + num(curseDamage) + " HP. (" + num(curseTurns) + " turns left)");
+    addLog("The curse gnaws at you for " + num(lost) + " HP. (" + num(curseTurns) + " turns left)");
 }
 
 static void hydraWail()
@@ -463,7 +470,7 @@ static void hydraWail()
         int dot = getEnemyAttackPower() * WAIL_DOT_PERCENT * heads / 300;
         curseDamage = dot < 1 ? 1 : dot;
         curseTurns = WAIL_DOT_TURNS;
-        addLog("The heads wail! A curse sinks in: -" + num(curseDamage) + " HP per turn for " + num(WAIL_DOT_TURNS) + " turns.");
+        addLog("The heads wail! A curse sinks in: -" + num(damageAfterDifficulty(curseDamage)) + " HP per turn for " + num(WAIL_DOT_TURNS) + " turns.");
     }
 }
 
@@ -479,7 +486,6 @@ static void hydraTurn()
 
     for (int i = 0; i < HYDRA_HEADS; i++)
     {
-        setHeadAction(i, act[i]);
         if (act[i] == HEAD_NONE || !playerAlive()) continue;
 
         std::string who = "Head " + num(i + 1);
@@ -521,7 +527,6 @@ static void enemyTurn()
     else if (type == ENEMY_HUMANOID_BAT) batTurn();
     else if (type == ENEMY_HYDRA) hydraTurn();
 }
-
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------*/
 //reults rewards and stuff for rounds
@@ -580,10 +585,31 @@ void battleReward()
     }
 }
 
+//the second half of a round: the boss answers. done right away, or later if the screen asked for a pause (setEnemyTurnDelay)
+static void bossAnswers()
+{
+    enemyTurn();
+    playerDefending = false;   //defend only covers this one enemy turn
+    if (buffTurns > 0) buffTurns--;     //one round of the buff used up
+    checkBattleResult();
+}
+
+//the end of a round: rewards if the boss is down, the defeat sound if the player is
+static void settleRound()
+{
+    if (battleResult == BATTLE_WON)
+        battleReward();
+    else if (battleResult == BATTLE_LOST)
+    {
+        addSound(SND_DEFEAT);
+        addLog("You collapse...");
+    }
+}
+
 int playerAction(int action, int itemId)
 {
-    //ignore the key if the fight isnt running, is already over, or the scientist is still talking
-    if (!battleActive || battleResult != BATTLE_ONGOING || isInIntro()) return battleResult;
+    //ignore the key if the fight isnt running, is already over, the scientist is still talking or the boss still has to answer
+    if (!battleActive || battleResult != BATTLE_ONGOING || isInIntro() || enemyTurnPending) return battleResult;
 
     clearLog();
     lastDamageToEnemy = 0;
@@ -609,20 +635,34 @@ int playerAction(int action, int itemId)
     //the boss only acts if he survived the players move
     if (checkBattleResult() == BATTLE_ONGOING)
     {
-        enemyTurn();
-        playerDefending = false;   //defend only covers this one enemy turn
-        if (buffTurns > 0) buffTurns--;     //one round of the buff used up
-        checkBattleResult();
+        if (delayEnemyTurn)       //the screen wants a small pause first, so the boss answers later (runPendingEnemyTurn)
+        {
+            enemyTurnPending = true;
+            return battleResult;
+        }
+        bossAnswers();
     }
 
-    if (battleResult == BATTLE_WON)
-        battleReward();
-    else if (battleResult == BATTLE_LOST)
-    {
-        addSound(SND_DEFEAT);
-        addLog("You collapse...");
-    }
+    settleRound();
     return battleResult;
+}
+
+void setEnemyTurnDelay(bool on) { delayEnemyTurn = on; }
+bool isEnemyTurnPending() { return enemyTurnPending; }
+
+void runPendingEnemyTurn()
+{
+    if (!enemyTurnPending) return;
+    enemyTurnPending = false;
+    if (!battleActive || battleResult != BATTLE_ONGOING) return;
+
+    clearLog();                  //the players lines were read during the pause, so the boss gets a clean text box
+    lastDamageToEnemy = 0;       //only what the boss does now (the screens numbers and shake would repeat the players hit otherwise)
+    lastDamageToPlayer = 0;
+    lastHitHead = -1;
+    roundCounterVal++;           //counts as its own step for the screen, so it shows the effects of this half too
+    bossAnswers();
+    settleRound();
 }
 
 int endBattle()
@@ -635,6 +675,7 @@ int endBattle()
     }
     battleActive    = false;
     playerDefending = false;
+    enemyTurnPending = false;
     return result;
 }
 
@@ -659,16 +700,57 @@ int getBattleResult() { return battleResult; }
 bool isPlayerDefending() { return playerDefending; }
 int playerBuffTurns() { return buffTurns; }
 int playerCurseTurns() { return curseTurns; }
-int playerCurseDamage() { return curseDamage; }
+int playerCurseDamage() { return damageAfterDifficulty(curseDamage); }   //what one curse tick really costs (difficulty included)
 //goes 2, 1, 2, 1... the screen uses it for the wail warning
 int hydraTurnsUntilWail() { return WAIL_EVERY - (hydraRound % WAIL_EVERY); }
 int battleLogCount() { return logCount; }
-bool isHydraDefeated() { return isBossTypeDefeated(ENEMY_HYDRA); }
 
 std::string getBattleLogLine(int index)
 {
     //a bad index gives "" instead of reading outside the array
     return (index >= 0 && index < logCount) ? logLines[index] : "";
+}
+
+//which words of a log line are about HP. the battle screen draws those in red.
+//the line is split on spaces, one true/false for each word. red = the word "HP" and the numbers that are an amount of hp:
+//"+15" / "-4" (with a sign), the number after "for" (damage) or a number right before "HP".
+//not red: head numbers ("head 2"), "Power 1/3", "Bats: 2", "3 turns", "+50 EXP"
+static std::string bareWord(const std::string& s)     //the word without the signs/punctuation around it: "(+6)." -> "6", "HP)" -> "HP"
+{
+    size_t a = 0, b = s.size();
+    while (a < b && !isalnum((unsigned char)s[a])) a++;
+    while (b > a && !isalnum((unsigned char)s[b - 1])) b--;
+    return s.substr(a, b - a);
+}
+
+std::vector<bool> hpWordFlags(const std::string& line)
+{
+    std::vector<std::string> words;
+    std::string cur;
+    for (size_t i = 0; i <= line.size(); i++)
+    {
+        if (i < line.size() && line[i] != ' ') { cur += line[i]; continue; }
+        if (!cur.empty()) words.push_back(cur);
+        cur.clear();
+    }
+
+    std::vector<bool> red(words.size(), false);
+    for (size_t i = 0; i < words.size(); i++)
+    {
+        std::string w = bareWord(words[i]);
+        if (w == "HP") { red[i] = true; continue; }
+
+        size_t digit = words[i].find_first_of("0123456789");
+        if (digit == std::string::npos) continue;               //no number in this word
+
+        std::string prev = (i > 0) ? bareWord(words[i - 1]) : "";
+        std::string next = (i + 1 < words.size()) ? bareWord(words[i + 1]) : "";
+        if (next == "EXP" || next == "turns" || next == "turn") continue;     //"+50 EXP", "for 3 turns", "(2 turns left)"
+
+        bool hasSign = (digit > 0 && (words[i][digit - 1] == '+' || words[i][digit - 1] == '-'));
+        if (hasSign || prev == "for" || next == "HP") red[i] = true;
+    }
+    return red;
 }
 
 void resetBattleSystem()
@@ -680,6 +762,7 @@ void resetBattleSystem()
     buffTurns = curseTurns = curseDamage = hydraRound = 0;
     pendingItem = -1;
     soundCount = 0;
+    enemyTurnPending = false;
     clearLog();
     resetDefeatedEnemies();   //new game, meaning every boss can be fought again
 }
