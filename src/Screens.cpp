@@ -1,4 +1,4 @@
-//AMINA AHMAD SYED 26L-0760 member 1
+//AMINA AHMAD SYED 26L-0760 member 1 and Zarnib's (member2) code.......
 //Screens.cpp ------ menu, hud, bag, story box, pause, game over and credits (drawing only)
 //WHAT THIS FILE DOES: draws every screen that is not the map or the battle. it never changes
 //the game, Game.cpp decides which screen to show and handles the keys
@@ -21,7 +21,7 @@ static std::string difficultyName(int d)
 static void dimScreen(sf::RenderWindow& window, int alpha)
 {
     sf::RectangleShape layer(sf::Vector2f((float)SCREEN_W, (float)SCREEN_H));
-    layer.setFillColor(sf::Color(0, 0, 0, alpha));
+    layer.setFillColor(sf::Color(0, 0, 0, alpha));                           //alpha for 0=transparent 
     window.draw(layer);
 }
 
