@@ -244,9 +244,8 @@ bool useItem(int itemId) {
         takeDamage(15);
     }
     else if (itemId == ITEM_BUFF_POTION) {
-        if (atkLevel >= maxAtkLevel) {
-            return false;               // attack is already at maximum
-        }
+        // at max attack level the permanent +1 is simply skipped (increaseAttackLevel caps itself),
+        // but the potion is still used: Battle.cpp adds the temporary x1.5 damage on top of this
         increaseAttackLevel();
     }
     else {
@@ -473,7 +472,7 @@ bool saveGameBackup(const string& filename) {
     }
 }
 
-// ----- Load from the text file -----
+// load from the text file 
 bool loadGameBackup(const string& filename) {
     try {
         ifstream in(filename.c_str());
@@ -496,7 +495,7 @@ bool loadGameBackup(const string& filename) {
         }
         in.close();
 
-        checkLoadedData(h, mh, lv, atk, ex, diff, bag);     // may throw
+        checkLoadedData(h, mh, lv, atk, ex, diff, bag);     //may throw
         useLoadedData(h, mh, lv, atk, ex, diff, flags, bag);
 
         lastError[0] = '\0';
