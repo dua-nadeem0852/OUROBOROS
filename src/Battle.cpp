@@ -300,7 +300,7 @@ bool useBattleItem(int itemId)
         return false;
     }
     int hpBefore = getPlayerHP();      //so poison can report how much it hurt
-    //Player.cpp decides if it works (healing at full hp / buff at max attack say no). if not, no turn is used
+    //Player.cpp decides if it works (healing at full hp says no; the buff always works, at max attack level it only skips the permanent +1). if not, no turn is used
     if (!useItem(itemId))
     {
         addLog("It had no effect.");
@@ -309,7 +309,7 @@ bool useBattleItem(int itemId)
 
     if (itemId == ITEM_BUFF_POTION)
     {
-        buffTurns = BUFF_TURNS;        //useItem already raised the attack level, this is the extra x1.5 for a few rounds
+        buffTurns = BUFF_TURNS;        //useItem already raised the attack level (if it was not at max yet), this is the extra x1.5 for a few rounds
         addSound(SND_BUFF);
         addLog("You drink the " + getItemName(itemId) + ". Power surges through you!");
     }
