@@ -74,7 +74,6 @@ If you change a story in `src/Story.cpp`, change its picture too.
 | `backgrounds/battle.png` | one shared background for any boss without its own | optional, not needed |
 
 - Backgrounds: about 2.4:1 (the ones here are about 1942x809). The battle screen adapts to any window shape.
-- Not used by the code (leftovers): `sprites/wizard.png`, `sprites/viktor_64x64_original.png`.
 - Pixel-art look for the bosses: set `SMOOTH_BOSS_SPRITES = false` in `src/BattleScreen.cpp`.
 
 ---
