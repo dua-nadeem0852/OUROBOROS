@@ -32,7 +32,7 @@ static const char itemDescriptions[6][60] = {
     "An old key. Does it fit a lock?"
 };
 
-// Player infor and using static so that only this file can use these variables directly
+// Player info and using static so that only this file can use these variables directly........
 // Other files will  use the functions from PlayerInterface.h. header file
 
 static int hp = 100;
@@ -59,7 +59,7 @@ static Item slot[INVENTORY_SLOTS] = {
     {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}, {-1, "", 0}
 };
 
-static char lastError[100] = "";    // remembers the last file problem
+static char lastError[100] = "";    // to  remembers the last file problem
 
 // Small helper functions only for this file use
 
@@ -78,7 +78,7 @@ static int findSlot(int itemId) {
     return -1;
 }
 
-// to find an empty slot in bag to put and if its full then return -1 means that its full now
+// to find an empty slot in bag to put and if its full then return -1 means that its full now......
 static int findEmptySlot() {
     for (int i = 0; i < INVENTORY_SLOTS; i++) {
         if (slot[i].quantity == 0) {
@@ -98,6 +98,7 @@ static int totalItemsInBag(const Item bag[], int rows) {
 }
 
 // uses recursion: the exp for a level is the exp for the level before it plus 100 (level 1 = 100, level 2 = 200, ...)
+//calling a function within itself.....
 
 static int expNeeded(int levl) {
     if (levl <= 1) {
